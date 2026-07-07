@@ -6,7 +6,8 @@ const BEGIN = '<!-- BEGIN skill-cli -->'
 const END = '<!-- END skill-cli -->'
 
 // Global instruction block — injected into each agent's global instruction file.
-// Kept short (~140 words) so it doesn't bloat agent context on every session.
+// Covers usage, defaults (auto-load), per-message discovery, and the
+// propose-then-confirm rule for context-altering skills.
 export const AGENTS_BLOCK = `## skill-cli
 
 This machine uses the \`skill\` command to manage skills (instruction / workflow
@@ -23,10 +24,20 @@ Defaults: on session start, run \`skill defaults\` to list skills marked as
 defaults (active by default + auto-load), then \`skill cat <name>\` for each. Mark
 your own with \`skill default <name>\` (global — active in every project).
 
+Discovery: skills are NOT used unless you load them — never assume a skill is
+already in context. On each user message, decide whether a skill is relevant to
+the task (match the message against a skill's triggers/topic); if one is relevant
+AND not yet loaded, load it with \`skill cat <name>\` (or \`skill trigger <keyword>\`
+to resolve a keyword to a skill). Load each skill only ONCE per session.
+
+Context-altering skills: some skills change HOW you respond — output style, tone,
+format, or a persistent mode (e.g. a terseness/compression style) — rather than
+just adding task knowledge. Do NOT auto-apply these. PROPOSE the skill and apply
+it only after the user confirms; an explicit \`/X\` trigger counts as confirmation.
+
 Triggers: when the user types \`/X\`, run \`skill trigger X\`.
 - Single match → apply the output directly.
 - Multiple matches → show the candidate list; load the right one with \`skill cat <name>\`.
-- Load each skill only ONCE per session (avoid re-injecting).
 `
 
 export function injectBlock(content) {
