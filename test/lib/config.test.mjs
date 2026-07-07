@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { computeEffective } from '../../src/lib/config.js'
+import { computeEffective, computeDefaults } from '../../src/lib/config.js'
 
 // build an installed-store entry the way listStore() does
 const sk = (name) => ({ name, dir: name, description: '', version: '1', triggers: [], path: '' })
@@ -100,4 +100,30 @@ test('deny case-insensitive: deny "REACT-*" blocks "react-bp"', () => {
 test('output is sorted', () => {
   const inst = [sk('c'), sk('a'), sk('b')]
   assert.deepEqual(computeEffective(inst, G(['c', 'a', 'b']), null), ['a', 'b', 'c'])
+})
+
+// ── computeDefaults (auto-load flag; an axis INDEPENDENT of enable/deny) ──────
+const GD = (defaults_global) => ({ defaults_global })
+
+test('computeDefaults: no project → global defaults', () => {
+  assert.deepEqual(computeDefaults([sk('a'), sk('b')], GD(['a']), null), ['a'])
+})
+test('computeDefaults: empty global + no project → []', () => {
+  assert.deepEqual(computeDefaults([sk('a')], GD([]), null), [])
+})
+test('computeDefaults: project defaults merge with inherited global', () => {
+  assert.deepEqual(computeDefaults([sk('a'), sk('b'), sk('c')], GD(['a']), P({ defaults: ['c'] })), ['a', 'c'])
+})
+test('computeDefaults: inherit=false → global defaults ignored', () => {
+  assert.deepEqual(computeDefaults([sk('a'), sk('b')], GD(['a']), P({ inherit: false, defaults: ['b'] })), ['b'])
+})
+test('computeDefaults: only installed skills resolve (ghost dropped)', () => {
+  assert.deepEqual(computeDefaults([sk('a')], GD(['a', 'ghost']), null), ['a'])
+})
+test('computeDefaults: case-insensitive, canonical, sorted', () => {
+  assert.deepEqual(computeDefaults([sk('React-BP'), sk('vue')], GD(['react-bp']), P({ defaults: ['VUE'] })), ['React-BP', 'vue'])
+})
+test('computeDefaults: independent of deny (a denied skill can still default)', () => {
+  // deny governs active state; the default flag is a separate axis
+  assert.deepEqual(computeDefaults([sk('a')], GD(['a']), P({ deny: ['*'] })), ['a'])
 })

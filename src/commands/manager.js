@@ -4,11 +4,11 @@ import { createPrompt, useState, useKeypress, usePrefix, isEnterKey, isUpKey, is
 import c from 'picocolors'
 import { STORE_DIR } from '../lib/paths.js'
 import { listStore } from '../lib/store.js'
-import { readGlobalConfig, readProjectConfig, writeProjectConfig, computeEffective } from '../lib/config.js'
+import { readGlobalConfig, readProjectConfig, writeProjectConfig, computeEffective, computeDefaults } from '../lib/config.js'
 import { cleanConfig } from './remove.js'
 import { trunc } from '../lib/format.js'
 
-const KEYS = c.gray('↑↓ move · space toggle · d delete · enter view · q quit')
+const KEYS = c.gray('↑↓ move · space toggle · a default · d delete · enter view · q quit')
 
 // where a skill's activation currently comes from (mirrors `skill list`)
 function labelScope(name, g, p) {
@@ -73,6 +73,27 @@ function viewBody(s) {
   return shown.join('\n')
 }
 
+// Pure decision: the new project `defaults` array after toggling `name`'s default
+// flag. (The manager `a` key is project-scoped; global defaults use the CLI.)
+export function computeToggleDefault(projCfg, name) {
+  const lc = String(name).toLowerCase()
+  const defs = [...(projCfg?.defaults || [])]
+  return defs.some(d => String(d).toLowerCase() === lc)
+    ? defs.filter(d => String(d).toLowerCase() !== lc)
+    : [...defs, lc]
+}
+
+// Apply the default toggle to disk and return a status line for the UI.
+function toggleDefault(name, cwd = process.cwd()) {
+  const installed = listStore()
+  const g = readGlobalConfig()
+  const p = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [], defaults: [] }
+  const wasDefault = computeDefaults(installed, g, p).includes(name)
+  const next = computeToggleDefault(p, name)
+  writeProjectConfig(cwd, { ...p, defaults: next })
+  return wasDefault ? (c.gray('· un-defaulted: ') + name) : (c.yellow('★ default: ') + name + c.gray(' (auto-load)'))
+}
+
 // Clamp a cursor move so it can't leave the list bounds (pure → unit-tested).
 export function moveCursor(cur, length, delta) {
   if (length <= 0) return 0
@@ -94,6 +115,7 @@ const managerPrompt = createPrompt((_config, done) => {
   const g = readGlobalConfig()
   const p = readProjectConfig()
   const eff = computeEffective(installed, g, p)
+  const defs = computeDefaults(installed, g, p)
   const cur = installed.length ? Math.max(0, Math.min(cursor, installed.length - 1)) : 0
   const s = installed[cur]
 
@@ -115,6 +137,7 @@ const managerPrompt = createPrompt((_config, done) => {
     if (isUpKey(key)) { setCursor(moveCursor(cur, installed.length, -1)); setStatus('') }
     else if (isDownKey(key)) { setCursor(moveCursor(cur, installed.length, 1)); setStatus('') }
     else if (key.name === 'space') { if (s) { setStatus(toggleActive(s.name)); setTick(tick + 1) } }
+    else if (key.name === 'a') { if (s) { setStatus(toggleDefault(s.name)); setTick(tick + 1) } }
     else if (key.name === 'd') { if (s) { setMode('confirm'); setStatus('') } }
     else if (isEnterKey(key)) { if (s) { setMode('view'); setStatus('') } }
     else if (key.name === 'q' || (key.ctrl && key.name === 'c')) done()
@@ -130,11 +153,12 @@ const managerPrompt = createPrompt((_config, done) => {
     const active = eff.includes(sk.name)
     const arrow = i === cur ? c.cyan('❯') : ' '
     const mark = active ? c.green('●') : c.gray('○')
+    const star = defs.includes(sk.name) ? c.yellow('★') : c.gray('·')
     const sc = labelScope(sk.name, g, p)
     const trg = sk.triggers.length ? '  ' + c.gray('/' + sk.triggers.join(', /')) : ''
     const nameStr = sk.name.padEnd(24)
     const nameCol = i === cur ? c.bold(nameStr) : nameStr
-    lines.push(`${arrow} ${mark} ${nameCol} ${c.gray(String(sk.version || '').padEnd(8))} ${sc}${trg}`)
+    lines.push(`${arrow} ${mark} ${star} ${nameCol} ${c.gray(String(sk.version || '').padEnd(8))} ${sc}${trg}`)
     if (i === cur && sk.description) lines.push(c.gray('      ' + trunc(sk.description, 62)))
   }
   lines.push(c.gray('  ' + '─'.repeat(58)))

@@ -12,6 +12,7 @@ import { cmdUpdate } from './commands/update.js'
 import { cmdRemove } from './commands/remove.js'
 import { cmdSearch } from './commands/search.js'
 import { cmdManager } from './commands/manager.js'
+import { cmdDefaults, cmdDefault, cmdUndefault } from './commands/defaults.js'
 import { isInteractive } from './lib/interactive.js'
 import { VERSION } from './lib/version.js'
 
@@ -32,6 +33,11 @@ ${c.bold('Activation')}
   ${c.cyan('skill enable')} ${c.gray('<name> [-g]')}  enable in project, or globally (-g)
   ${c.cyan('skill disable')} ${c.gray('<name> [-g]')} disable
   ${c.cyan('skill list')}                  installed + active skills (cwd-aware)
+
+${c.bold('Defaults (auto-load)')}
+  ${c.cyan('skill default')} ${c.gray('<name> [-g]')} mark a skill for auto-load on session start
+  ${c.cyan('skill undefault')} ${c.gray('<name> [-g]')} remove the default flag
+  ${c.cyan('skill defaults')}                 list default skills (agent runs this on start)
 
 ${c.bold('Usage (agent)')}
   ${c.cyan('skill show')} ${c.gray('<name>')}         metadata + path + triggers
@@ -84,6 +90,9 @@ async function main() {
     case 'enable': cmdEnable(rest); break
     case 'disable': cmdDisable(rest); break
     case 'list': case 'ls': cmdList(rest); break
+    case 'defaults': cmdDefaults(rest); break
+    case 'default': case 'def': cmdDefault(rest); break
+    case 'undefault': case 'undef': cmdUndefault(rest); break
     case 'show': case 'info': cmdShow(rest); break
     case 'cat': cmdCat(rest); break
     case 'trigger': cmdTrigger(rest); break

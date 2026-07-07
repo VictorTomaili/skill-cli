@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { computeToggle, moveCursor } from '../../src/commands/manager.js'
+import { computeToggle, moveCursor, computeToggleDefault } from '../../src/commands/manager.js'
 
 // computeToggle is a PURE decision (no I/O), so it's unit-testable in-process
 // without SKILL_CLI_HOME or a store on disk — we pass fake configs directly.
@@ -61,4 +61,18 @@ test('moveCursor: empty list → 0 (no crash)', () => {
 
 test('moveCursor: clamps an out-of-range cursor (after a delete shrinks the list)', () => {
   assert.equal(moveCursor(7, 3, 0), 2)   // cursor was 7, list is now 3 → last index 2
+})
+
+// computeToggleDefault — the manager `a` key toggles the project default flag.
+test('computeToggleDefault: off → on (adds, lowercased)', () => {
+  assert.deepEqual(computeToggleDefault({ defaults: [] }, 'Alpha'), ['alpha'])
+})
+test('computeToggleDefault: on → off (removes, case-insensitive)', () => {
+  assert.deepEqual(computeToggleDefault({ defaults: ['alpha'] }, 'ALPHA'), [])
+})
+test('computeToggleDefault: null projCfg → starts from empty', () => {
+  assert.deepEqual(computeToggleDefault(null, 'x'), ['x'])
+})
+test('computeToggleDefault: leaves siblings untouched', () => {
+  assert.deepEqual(computeToggleDefault({ defaults: ['a', 'b'] }, 'b'), ['a'])
 })

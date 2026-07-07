@@ -7,6 +7,7 @@ const DEFAULT_GLOBAL = {
   version: 1,
   store: STORE_DIR,
   enabled_global: [],
+  defaults_global: [],
 }
 
 export function readGlobalConfig() {
@@ -29,6 +30,7 @@ export function writeGlobalConfig(cfg) {
     version: cfg.version ?? 1,
     store: cfg.store ?? STORE_DIR,
     enabled_global: cfg.enabled_global || [],
+    defaults_global: cfg.defaults_global || [],
   }
   fs.writeFileSync(GLOBAL_CONFIG, yaml.stringify(out), 'utf8')
 }
@@ -47,7 +49,7 @@ export function readProjectConfig(cwd = process.cwd()) {
     process.stderr.write('skill.config: parse error (' + (e.message || e) + ') — using global behavior\n')
     return null
   }
-  return { inherit: true, deny: [], allow: [], ...(parsed || {}) }
+  return { inherit: true, deny: [], allow: [], defaults: [], ...(parsed || {}) }
 }
 
 export function writeProjectConfig(cwd, cfg) {
@@ -56,6 +58,7 @@ export function writeProjectConfig(cwd, cfg) {
     inherit: cfg.inherit !== false,
     deny: cfg.deny || [],
     allow: cfg.allow || [],
+    defaults: cfg.defaults || [],
   }
   fs.writeFileSync(projectConfigPath(cwd), yaml.stringify(out), 'utf8')
 }
@@ -97,4 +100,18 @@ export function computeEffective(installed, globalCfg, projCfg) {
     .filter(n => canonByLower.has(n))
     .map(n => canonByLower.get(n))
     .sort()
+}
+
+// Effective DEFAULT skills (auto-loaded on agent session start), as CANONICAL
+// names. Independent of enable/disable: a skill may be active-but-not-default or
+// default-but-not-active. Inherits global defaults unless the project sets
+// inherit:false. Case-insensitive throughout.
+export function computeDefaults(installed, globalCfg, projCfg) {
+  const canonByLower = new Map(installed.map(s => [String(s.name).toLowerCase(), s.name]))
+  const set = new Set()
+  if (!projCfg || projCfg.inherit !== false) {
+    for (const d of (globalCfg.defaults_global || [])) set.add(String(d).toLowerCase())
+  }
+  if (projCfg) for (const d of (projCfg.defaults || [])) set.add(String(d).toLowerCase())
+  return [...set].filter(n => canonByLower.has(n)).map(n => canonByLower.get(n)).sort()
 }
