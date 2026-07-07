@@ -1,0 +1,21 @@
+{
+  "name": "skill-cli",
+  "version": "0.1.0",
+  "description": "Cross-agent skill manager: single global store + activation via skill.config + bootstrap via AGENTS.md",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "skill": "./src/cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1",
+    "yaml": "^2.6.0"
+  },
+  "keywords": ["cli", "skills", "agent", "ai", "claude", "codex", "cursor"]
+}
