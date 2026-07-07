@@ -78,10 +78,11 @@ short bootstrap block telling it to run `skill` on `/X`.
 | `skill list` | Show installed + active skills (cwd-aware) |
 | `skill show <name>` | Skill metadata (path, triggers, version) |
 | `skill cat <name>` | Dump skill content into context |
-| `skill trigger <keyword>` | `/X` trigger: single→content, multi→candidates, none→info |
+| `skill trigger <keyword\|name>` | `/X` trigger or skill name → content (single), candidates (multi) |
 | `skill update [name…\|--all]` | Re-fetch from source, update changed skills |
+| `skill remove <name> [-y]` | Remove from store (prompts on TTY; agents / CI / `-y` skip) |
 
-Aliases: `ls` (list), `add` (install), `info` (show).
+Aliases: `ls` (list), `add` (install), `info` (show), `rm`/`uninstall` (remove).
 
 ## Install sources
 

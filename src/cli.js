@@ -9,6 +9,7 @@ import { cmdEnable } from './commands/enable.js'
 import { cmdDisable } from './commands/disable.js'
 import { cmdInstall } from './commands/install.js'
 import { cmdUpdate } from './commands/update.js'
+import { cmdRemove } from './commands/remove.js'
 import { VERSION } from './lib/version.js'
 
 const HELP = `${c.bold('skill')} ${c.gray('v' + VERSION)} — cross-agent skill manager
@@ -33,6 +34,7 @@ ${c.bold('Usage (agent)')}
 
 ${c.bold('Maintenance')}
   ${c.cyan('skill update')} ${c.gray('[name|--all]')} refresh store from source
+  ${c.cyan('skill remove')} ${c.gray('<name> [-y]')}  remove from store (prompt unless -y / non-TTY)
 
 ${c.gray('Source formats (install): owner/repo | github/gitlab URL | git URL | local path | npm package')}
 ${c.gray('Test (no real ~ touched): SKILL_CLI_HOME=/tmp/sktest skill init -g')}
@@ -58,6 +60,7 @@ try {
     case 'cat': cmdCat(rest); break
     case 'trigger': cmdTrigger(rest); break
     case 'update': cmdUpdate(rest); break
+    case 'remove': case 'rm': case 'uninstall': cmdRemove(rest); break
     case '-v': case '--version':
       console.log('skill-cli ' + VERSION); break
     default:

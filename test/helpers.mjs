@@ -21,11 +21,12 @@ export function mkHome() {
 
 // run the CLI against `home`; returns { out, err, code } (code=0 on success).
 // `env` is merged in (used to set SKILL_CLI_FETCH_FIXTURE for install/update tests).
-export function run(home, args, env = {}) {
+export function run(home, args, env = {}, input = undefined) {
   try {
     const out = execFileSync('node', [CLI_PATH, ...args], {
       cwd: home,
       env: { ...process.env, SKILL_CLI_HOME: home, MSYS_NO_PATHCONV: '1', ...env },
+      input,
       encoding: 'utf8',
     })
     return { out, err: '', code: 0 }

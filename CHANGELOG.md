@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `skill remove <name>... [-y]` (aliases `rm`, `uninstall`) — removes skill(s) from the store and cleans up the global enabled list + current project allow-list. Interactive `y/N` confirmation when run on a TTY; non-interactive (no prompt) for agents, CI, and pipes, or when `-y`/`--yes`/`-f`/`--force` is passed. Default answer is **N** (keep).
+
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
