@@ -8,7 +8,6 @@ export const HOME = process.env.SKILL_CLI_HOME || os.homedir()
 export const CLI_ROOT = path.join(HOME, '.skill-cli')
 export const STORE_DIR = path.join(CLI_ROOT, 'store')
 export const GLOBAL_CONFIG = path.join(CLI_ROOT, 'config.yaml')
-export const SHARE_DIR = path.join(CLI_ROOT, 'share')
 
 export const PROJECT_CONFIG = 'skill.config'
 

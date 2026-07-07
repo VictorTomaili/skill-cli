@@ -7,8 +7,31 @@ import os from 'node:os'
 // Output lands in <tmp>/.claude/skills/ — never in real agent dirs. The caller
 // owns the returned `tmp` and MUST rmSync(tmp, {recursive,force}) in a finally.
 //
-// shell:false + args array (no injection). On Windows, Node 20+ refuses to spawn
-// .cmd without a shell, so we route through `cmd.exe /c` which resolves npx.
+// Assemble the spawn target for `npx skills add` so it runs safely on every
+// platform. Pure + exported so the per-platform branching is unit-testable.
+//
+// Windows (process.platform === 'win32', incl. Git Bash / Cygwin / MSYS — Node
+// still reports 'win32'): Node 20+ (CVE-2024-27980) refuses to spawn .cmd/.bat
+// files such as npx.cmd with shell:false. We spawn cmd.exe (a real .exe) and let
+// it resolve npx via `cmd.exe /c npx ...`.
+//
+// Linux / macOS / WSL: npx is a real executable on PATH (ships with npm/node),
+// spawned directly.
+//
+// On ALL platforms we use shell:false with an args array, so the source is passed
+// as a single argv element — no shell injection — and `--skill *` stays literal
+// (cmd.exe does no globbing and no POSIX shell is ever involved). npx must be on
+// PATH; it ships with node/npm on every platform.
+export function buildNpxSpawn(source, platform = process.platform) {
+  const base = ['-y', 'skills', 'add', source, '--copy', '--agent', 'claude-code', '--skill', '*', '-y']
+  return platform === 'win32'
+    ? { cmd: 'cmd.exe', args: ['/c', 'npx', ...base] }
+    : { cmd: 'npx', args: base }
+}
+
+// Fetch skill(s) from `source` into a TEMP cwd via `npx skills add --copy`.
+// Output lands in <tmp>/.claude/skills/ — never in real agent dirs. The caller
+// owns the returned `tmp` and MUST rmSync(tmp, {recursive,force}) in a finally.
 export function fetchSkillsToTemp(source) {
   // Test seam: when SKILL_CLI_FETCH_FIXTURE is set, copy a local fixture tree
   // instead of spawning npx. Lets install/update run with zero network.
@@ -21,11 +44,7 @@ export function fetchSkillsToTemp(source) {
   if (/[\r\n]/.test(safe)) throw new Error('source must be a single line')
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-cli-'))
-  const isWin = process.platform === 'win32'
-  const cmd = isWin ? 'cmd.exe' : 'npx'
-  const args = isWin
-    ? ['/c', 'npx', '-y', 'skills', 'add', safe, '--copy', '--agent', 'claude-code', '--skill', '*', '-y']
-    : ['-y', 'skills', 'add', safe, '--copy', '--agent', 'claude-code', '--skill', '*', '-y']
+  const { cmd, args } = buildNpxSpawn(safe)
 
   try {
     execFileSync(cmd, args, {
@@ -38,11 +57,17 @@ export function fetchSkillsToTemp(source) {
     })
   } catch (e) {
     fs.rmSync(tmp, { recursive: true, force: true })
-    const timedOut = e.signal === 'SIGTERM' || e.code === 'ETIMEDOUT'
-    const tail = timedOut ? '' : ((e.stderr || e.stdout) || '').toString().trim().split('\n').pop()
-    const msg = timedOut
-      ? 'fetch timed out after 3 min (network too slow or source too large?)'
-      : 'fetch failed: ' + (tail || e.message)
+    let msg
+    if (e.code === 'ENOENT') {
+      // npx/node not on PATH — same message on every platform
+      msg = 'npx not found on PATH — is Node.js (with npm) installed?'
+    } else {
+      const timedOut = e.signal === 'SIGTERM' || e.code === 'ETIMEDOUT'
+      const tail = timedOut ? '' : ((e.stderr || e.stdout) || '').toString().trim().split('\n').pop()
+      msg = timedOut
+        ? 'fetch timed out after 3 min (network too slow or source too large?)'
+        : 'fetch failed: ' + (tail || e.message)
+    }
     const err = new Error(msg)
     err.cause = e
     throw err

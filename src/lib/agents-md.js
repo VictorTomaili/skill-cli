@@ -25,7 +25,7 @@ Triggers: when the user types \`/X\`, run \`skill trigger X\`.
 - Load each skill only ONCE per session (avoid re-injecting).
 `
 
-function injectBlock(content) {
+export function injectBlock(content) {
   const wrapped = `${BEGIN}\n${AGENTS_BLOCK}\n${END}`
   if (content.includes(BEGIN)) {
     return content.replace(new RegExp(`${BEGIN}[\\s\\S]*?${END}`), wrapped)

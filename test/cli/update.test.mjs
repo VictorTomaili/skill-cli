@@ -61,10 +61,26 @@ test('update: specific name processes only that skill', () => {
   assert.doesNotMatch(out, /beta/)
 })
 
-test('update: nonexistent name → "not installed"', () => {
+test('update: nonexistent name → "not installed" + non-zero exit (R2)', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   putStoreSkill(h, 'alpha', {})
-  assert.match(strip(run(h, ['update', 'ghost']).out), /not installed/)
+  const r = run(h, ['update', 'ghost'])
+  assert.match(strip(r.out), /not installed/)
+  assert.notEqual(r.code, 0)
+})
+
+test('update: source no longer ships the skill → "not found" + exit 1, no overwrite (R5)', () => {
+  const h = mkHome(); run(h, ['init', '-g'])
+  const fixA = mkSource(h, 'fixA', [{ name: 'alpha', version: '1.0.0' }])
+  installFrom(h, fixA)
+  // a DIFFERENT single-skill fixture — old code would single-guess and overwrite
+  const fixB = mkSource(h, 'fixB', [{ name: 'totally-different', version: '1.0.0' }])
+  const r = run(h, ['update', 'alpha'], { SKILL_CLI_FETCH_FIXTURE: fixB })
+  assert.match(strip(r.out), /not found/i)
+  assert.notEqual(r.code, 0)
+  // alpha must be preserved, NOT replaced with the other skill's content
+  const stored = fs.readFileSync(path.join(h, '.skill-cli', 'store', 'alpha', 'SKILL.md'), 'utf8')
+  assert.match(stored, /name: alpha/)
 })
 
 test('update: preserves .source after replacing content', () => {

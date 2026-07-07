@@ -29,6 +29,9 @@ export function cmdUpdate(args) {
 
   console.log()
   console.log(c.gray(`  ${counts.updated} updated · ${counts.current} up to date · ${counts.failed} failed · ${counts.nosource} no source`))
+  // signal failure to callers/scripts: a non-zero exit if any fetch failed, so
+  // `skill update && deploy` won't silently proceed on a broken source.
+  if (counts.failed > 0) process.exit(1)
 }
 
 function updateOne(name) {
@@ -93,7 +96,10 @@ function resolveFetched(fetchedDir, name) {
       } catch {}
     }
   }
-  return entries.length === 1 ? entries[0] : null
+  // Not found by dir name or SKILL.md name field. Do NOT guess — the previous
+  // single-entry fallback could silently replace a skill with a different one if
+  // the source had changed which skill it ships. Fail loud so the user notices.
+  return null
 }
 
 // sha256 over all files in dir (excluding our own .source), sorted for determinism
