@@ -29,7 +29,7 @@ ${c.bold('Activation')}
 ${c.bold('Usage (agent)')}
   ${c.cyan('skill show')} ${c.gray('<name>')}         metadata + path + triggers
   ${c.cyan('skill cat')} ${c.gray('<name>')}          dump content to context
-  ${c.cyan('skill trigger')} ${c.gray('<keyword>')}   /X trigger: single→content, multi→candidates
+  ${c.cyan('skill trigger')} ${c.gray('<keyword|name>')}   /X trigger or skill name → content
 
 ${c.bold('Maintenance')}
   ${c.cyan('skill update')} ${c.gray('[name|--all]')} refresh store from source

@@ -83,3 +83,53 @@ test('trigger: reads CANONICAL name (M1 — does not crash on name lookup)', () 
   const out = strip(run(h, ['trigger', 'bp']).out)
   assert.match(out, /React BP/)
 })
+
+// --- name fallback: skills with no `triggers:` field (e.g. imported vercel-labs skills) ---
+
+test('trigger: exact NAME (active, no triggers field) → dumps content', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'web-design-guidelines', { description: 'Review UI' }, '# Web Design Guidelines\nbody')
+  run(h, ['enable', 'web-design-guidelines', '-g'])
+  const out = strip(run(h, ['trigger', 'web-design-guidelines']).out)
+  assert.match(out, /Web Design Guidelines/)
+  assert.match(out, /name: web-design-guidelines/)
+})
+
+test('trigger: exact NAME with leading slash also works', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'writing-guidelines', {}, '# Writing')
+  run(h, ['enable', 'writing-guidelines', '-g'])
+  assert.match(strip(run(h, ['trigger', '/writing-guidelines']).out), /Writing/)
+})
+
+test('trigger: exact NAME is case-insensitive', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'Deploy-To-Vercel', {}, '# Deploy Body')
+  run(h, ['enable', 'deploy-to-vercel', '-g'])
+  assert.match(strip(run(h, ['trigger', 'DEPLOY-TO-VERCEL']).out), /Deploy Body/)
+})
+
+test('trigger: NAME of a PASSIVE skill → enable hint, no dump', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'passive-skill', { description: 'x' }, '# Secret Body')
+  const out = strip(run(h, ['trigger', 'passive-skill']).out)   // not enabled
+  assert.doesNotMatch(out, /Secret Body/)
+  assert.match(out, /installed but not active/i)
+  assert.match(out, /skill enable/)
+  assert.match(out, /skill cat/)
+})
+
+test('trigger: trigger-keyword path and name path compose (different labels)', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'deep-research', { triggers: ['research'] }, '# Deep Research')
+  run(h, ['enable', 'deep-research', '-g'])
+  // by trigger keyword → "triggered: /research"
+  assert.match(strip(run(h, ['trigger', 'research']).out), /triggered: \/research/)
+  // by literal name (no trigger matches the name) → name fallback → "name: deep-research"
+  assert.match(strip(run(h, ['trigger', 'deep-research']).out), /name: deep-research/)
+})
