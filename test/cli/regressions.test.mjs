@@ -70,7 +70,7 @@ test('B2: stale default_agents + junk keys dropped on next write (normalize)', (
   fs.writeFileSync(cfgPath, [
     'version: 1',
     'store: ' + path.join(h, '.skill-cli', 'store'),
-    'enabled_global: []',
+    'defaults: []',
     'default_agents:',
     '  - claude',
     '  - codex',
@@ -82,7 +82,32 @@ test('B2: stale default_agents + junk keys dropped on next write (normalize)', (
   const after = fs.readFileSync(cfgPath, 'utf8')
   assert.doesNotMatch(after, /default_agents/)
   assert.doesNotMatch(after, /some_future_key/)
-  assert.match(after, /enabled_global:/)
+  assert.match(after, /defaults:/)
+})
+
+test('B2b: legacy enabled_global + defaults_global migrate into defaults (union, backward-compat)', () => {
+  const h = mkHome(); run(h, ['init', '-g'])
+  // seed an OLD-format config (pre-0.4.0) carrying BOTH legacy lists
+  const cfgPath = path.join(h, '.skill-cli', 'config.yaml')
+  fs.writeFileSync(cfgPath, [
+    'version: 1',
+    'store: ' + path.join(h, '.skill-cli', 'store'),
+    'enabled_global:',
+    '  - commit-helper',
+    '  - shared',
+    'defaults_global:',
+    '  - shared',
+    '  - research',
+  ].join('\n') + '\n')
+  // a re-init normalizes on write: the UNION of both legacy lists → defaults (deduped)
+  run(h, ['init', '-g'])
+  const after = fs.readFileSync(cfgPath, 'utf8')
+  assert.match(after, /defaults:/)                  // new key written
+  assert.doesNotMatch(after, /enabled_global:/)     // legacy keys dropped on write
+  assert.doesNotMatch(after, /defaults_global:/)
+  assert.match(after, /commit-helper/)              // every value preserved
+  assert.match(after, /research/)
+  assert.equal((after.match(/\bshared\b/g) || []).length, 1)   // deduped (once)
 })
 
 test('B3: show uses "-" (not "?") for a missing version field', () => {

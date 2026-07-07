@@ -8,12 +8,12 @@ export function cmdDisable(args) {
 
   if (global) {
     const cfg = readGlobalConfig()
-    const had = (cfg.enabled_global || []).some(a => a.toLowerCase() === name.toLowerCase())
-    cfg.enabled_global = (cfg.enabled_global || []).filter(a => a.toLowerCase() !== name.toLowerCase())
+    const had = (cfg.defaults || []).some(a => a.toLowerCase() === name.toLowerCase())
+    cfg.defaults = (cfg.defaults || []).filter(a => a.toLowerCase() !== name.toLowerCase())
     writeGlobalConfig(cfg)
     console.log(had
-      ? (c.green('✓') + ' disabled globally: ' + c.bold(name))
-      : (c.gray('·') + ' not enabled globally: ' + c.bold(name) + c.gray(' (nothing to do)')))
+      ? (c.green('✓') + ' removed global default: ' + c.bold(name))
+      : (c.gray('·') + ' not a global default: ' + c.bold(name) + c.gray(' (nothing to do)')))
   } else {
     const cwd = process.cwd()
     const cfg = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [] }

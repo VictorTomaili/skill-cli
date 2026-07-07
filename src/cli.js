@@ -30,14 +30,14 @@ ${c.bold('Acquire skills')}
   ${c.cyan('skill search')}                  interactive search & multi-install (TTY only)
 
 ${c.bold('Activation')}
-  ${c.cyan('skill enable')} ${c.gray('<name> [-g]')}  enable in project, or globally (-g)
-  ${c.cyan('skill disable')} ${c.gray('<name> [-g]')} disable
+  ${c.cyan('skill enable')} ${c.gray('<name> [-g]')}  allow in project, or global default (-g)
+  ${c.cyan('skill disable')} ${c.gray('<name> [-g]')} deny in project, or remove global default (-g)
   ${c.cyan('skill list')}                  installed + active skills (cwd-aware)
 
-${c.bold('Defaults (auto-load)')}
-  ${c.cyan('skill default')} ${c.gray('<name> [-g]')} mark a skill for auto-load on session start
-  ${c.cyan('skill undefault')} ${c.gray('<name> [-g]')} remove the default flag
-  ${c.cyan('skill defaults')}                 list default skills (agent runs this on start)
+${c.bold('Defaults (active + auto-load)')}
+  ${c.cyan('skill default')} ${c.gray('<name>')}    mark a default skill (global: active in every project)
+  ${c.cyan('skill undefault')} ${c.gray('<name>')}  remove the default flag
+  ${c.cyan('skill defaults')}                  list default skills (agent runs this on start)
 
 ${c.bold('Usage (agent)')}
   ${c.cyan('skill show')} ${c.gray('<name>')}         metadata + path + triggers

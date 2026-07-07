@@ -6,8 +6,8 @@ import { computeToggle, moveCursor, computeToggleDefault } from '../../src/comma
 // without SKILL_CLI_HOME or a store on disk — we pass fake configs directly.
 // This locks the allow/deny dance the manager's `space` key performs.
 const installed = [{ name: 'alpha' }]
-const gEmpty = { enabled_global: [] }
-const gGlobal = { enabled_global: ['alpha'] }
+const gEmpty = { defaults: [] }
+const gGlobal = { defaults: ['alpha'] }
 const pNone = null
 const pAllow = { allow: ['alpha'], deny: [] }
 const pDeny = { allow: [], deny: ['alpha'] }
@@ -65,14 +65,14 @@ test('moveCursor: clamps an out-of-range cursor (after a delete shrinks the list
 
 // computeToggleDefault — the manager `a` key toggles the project default flag.
 test('computeToggleDefault: off → on (adds, lowercased)', () => {
-  assert.deepEqual(computeToggleDefault({ defaults: [] }, 'Alpha'), ['alpha'])
+  assert.deepEqual(computeToggleDefault([], 'Alpha'), ['alpha'])
 })
 test('computeToggleDefault: on → off (removes, case-insensitive)', () => {
-  assert.deepEqual(computeToggleDefault({ defaults: ['alpha'] }, 'ALPHA'), [])
+  assert.deepEqual(computeToggleDefault(['alpha'], 'ALPHA'), [])
 })
-test('computeToggleDefault: null projCfg → starts from empty', () => {
+test('computeToggleDefault: null/undefined list → starts from empty', () => {
   assert.deepEqual(computeToggleDefault(null, 'x'), ['x'])
 })
 test('computeToggleDefault: leaves siblings untouched', () => {
-  assert.deepEqual(computeToggleDefault({ defaults: ['a', 'b'] }, 'b'), ['a'])
+  assert.deepEqual(computeToggleDefault(['a', 'b'], 'b'), ['a'])
 })

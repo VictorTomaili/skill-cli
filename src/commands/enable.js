@@ -16,11 +16,11 @@ export function cmdEnable(args) {
 
   if (global) {
     const cfg = readGlobalConfig()
-    if (!cfg.enabled_global.some(a => a.toLowerCase() === name.toLowerCase())) {
-      cfg.enabled_global.push(name.toLowerCase()); cfg.enabled_global.sort()
+    if (!(cfg.defaults || []).some(a => a.toLowerCase() === name.toLowerCase())) {
+      cfg.defaults.push(name.toLowerCase()); cfg.defaults.sort()
     }
     writeGlobalConfig(cfg)
-    console.log(c.green('✓') + ' enabled globally: ' + c.bold(name) + c.gray('  (active in all projects)'))
+    console.log(c.green('✓') + ' enabled globally (default): ' + c.bold(name) + c.gray('  (active + auto-load in all projects)'))
   } else {
     const cwd = process.cwd()
     const cfg = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [] }

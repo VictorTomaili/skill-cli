@@ -4,7 +4,7 @@ import { createPrompt, useState, useKeypress, usePrefix, isEnterKey, isUpKey, is
 import c from 'picocolors'
 import { STORE_DIR } from '../lib/paths.js'
 import { listStore } from '../lib/store.js'
-import { readGlobalConfig, readProjectConfig, writeProjectConfig, computeEffective, computeDefaults } from '../lib/config.js'
+import { readGlobalConfig, writeGlobalConfig, readProjectConfig, writeProjectConfig, computeEffective, computeDefaults } from '../lib/config.js'
 import { cleanConfig } from './remove.js'
 import { trunc } from '../lib/format.js'
 
@@ -13,13 +13,13 @@ const KEYS = c.gray('↑↓ move · space toggle · a default · d delete · ent
 // where a skill's activation currently comes from (mirrors `skill list`)
 function labelScope(name, g, p) {
   if (p && (p.allow || []).some(a => a.toLowerCase() === name.toLowerCase())) return c.magenta('project')
-  if ((g.enabled_global || []).some(a => a.toLowerCase() === name.toLowerCase())) return c.blue('global ')
+  if ((g.defaults || []).some(a => a.toLowerCase() === name.toLowerCase())) return c.blue('global ')
   return c.gray('-      ')
 }
 
 // Pure decision: given the current configs, compute the new {allow, deny} arrays
 // that flip `name`'s active state in THIS project. No I/O → unit-testable without
-// SKILL_CLI_HOME. enabled_global is untouched (the manager toggle is project-scoped).
+// SKILL_CLI_HOME. The global `defaults` list is untouched (the manager toggle is project-scoped).
 //   passive → add to project allow (active here)
 //   active via project allow → remove from allow
 //   active via global only → add a local deny so it goes passive HERE
@@ -31,7 +31,7 @@ export function computeToggle(installed, globalCfg, projCfg, name) {
     allow: [...(projCfg?.allow || [])],
   }
   const active = computeEffective(installed, globalCfg, p).includes(name)
-  const isGlobal = (globalCfg.enabled_global || []).some(a => String(a).toLowerCase() === lc)
+  const isGlobal = (globalCfg.defaults || []).some(a => String(a).toLowerCase() === lc)
   const isProjectAllow = p.allow.some(a => String(a).toLowerCase() === lc)
   if (active) {
     p.allow = p.allow.filter(a => String(a).toLowerCase() !== lc)
@@ -73,25 +73,25 @@ function viewBody(s) {
   return shown.join('\n')
 }
 
-// Pure decision: the new project `defaults` array after toggling `name`'s default
-// flag. (The manager `a` key is project-scoped; global defaults use the CLI.)
-export function computeToggleDefault(projCfg, name) {
+// Pure decision: the new global `defaults` array after toggling `name`'s default
+// flag. (Defaults are a GLOBAL concept — active by default + auto-load. The
+// manager `a` key edits this list; `space` does the per-folder allow/deny.)
+export function computeToggleDefault(list, name) {
   const lc = String(name).toLowerCase()
-  const defs = [...(projCfg?.defaults || [])]
+  const defs = [...(list || [])]
   return defs.some(d => String(d).toLowerCase() === lc)
     ? defs.filter(d => String(d).toLowerCase() !== lc)
     : [...defs, lc]
 }
 
-// Apply the default toggle to disk and return a status line for the UI.
-function toggleDefault(name, cwd = process.cwd()) {
+// Apply the default toggle to the GLOBAL config and return a status line for the UI.
+function toggleDefault(name) {
   const installed = listStore()
   const g = readGlobalConfig()
-  const p = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [], defaults: [] }
-  const wasDefault = computeDefaults(installed, g, p).includes(name)
-  const next = computeToggleDefault(p, name)
-  writeProjectConfig(cwd, { ...p, defaults: next })
-  return wasDefault ? (c.gray('· un-defaulted: ') + name) : (c.yellow('★ default: ') + name + c.gray(' (auto-load)'))
+  const wasDefault = computeDefaults(installed, g).includes(name)
+  g.defaults = computeToggleDefault(g.defaults, name)
+  writeGlobalConfig(g)
+  return wasDefault ? (c.gray('· un-defaulted: ') + name) : (c.yellow('★ default: ') + name + c.gray(' (active + auto-load)'))
 }
 
 // Clamp a cursor move so it can't leave the list bounds (pure → unit-tested).
@@ -115,7 +115,7 @@ const managerPrompt = createPrompt((_config, done) => {
   const g = readGlobalConfig()
   const p = readProjectConfig()
   const eff = computeEffective(installed, g, p)
-  const defs = computeDefaults(installed, g, p)
+  const defs = computeDefaults(installed, g)
   const cur = installed.length ? Math.max(0, Math.min(cursor, installed.length - 1)) : 0
   const s = installed[cur]
 

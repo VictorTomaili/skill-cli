@@ -30,11 +30,14 @@ test('default <name> -g → appears in `skill defaults`', () => {
   assert.match(strip(d.out), /an alpha skill/)
 })
 
-test('default <name> (project) → recorded in skill.config, listed in this cwd', () => {
+test('default <name> (no -g) → global default (config.yaml, not skill.config)', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   putStoreSkill(h, 'beta')
   assert.equal(run(h, ['default', 'beta']).code, 0)
   assert.match(strip(run(h, ['defaults']).out), /beta/)
+  // defaults are GLOBAL: no skill.config is created, the entry lives in config.yaml
+  assert.ok(!fs.existsSync(path.join(h, 'skill.config')))
+  assert.match(fs.readFileSync(path.join(h, '.skill-cli', 'config.yaml'), 'utf8'), /- beta/)
 })
 
 test('undefault <name> -g → removed from defaults', () => {
@@ -50,7 +53,7 @@ test('undefault when not a default → graceful no-op', () => {
   putStoreSkill(h, 'alpha')
   const r = run(h, ['undefault', 'alpha', '-g'])
   assert.equal(r.code, 0)
-  assert.match(strip(r.out), /not a global default/)
+  assert.match(strip(r.out), /not a default/)
 })
 
 test('list shows ★ for a default skill', () => {

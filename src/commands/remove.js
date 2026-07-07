@@ -94,8 +94,8 @@ export function cmdRemove(args) {
 // Exported so the interactive manager can reuse it on its `d` (delete) action.
 export function cleanConfig(name) {
   const g = readGlobalConfig()
-  if ((g.enabled_global || []).some(a => a.toLowerCase() === name.toLowerCase())) {
-    g.enabled_global = (g.enabled_global || []).filter(a => a.toLowerCase() !== name.toLowerCase())
+  if ((g.defaults || []).some(a => a.toLowerCase() === name.toLowerCase())) {
+    g.defaults = (g.defaults || []).filter(a => a.toLowerCase() !== name.toLowerCase())
     writeGlobalConfig(g)
   }
   const cwd = process.cwd()

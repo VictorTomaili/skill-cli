@@ -19,7 +19,7 @@ config file.
 - 🔌 **Universal sources** — `owner/repo`, GitHub/GitLab URL, git URL, local path, npm package (via `npx skills`).
 - ⚡ **Pull-based** — agents pull skill content into context on demand via `skill trigger /X`. No hooks required.
 - 🔍 **Interactive TUIs** — `skill search` to discover & multi-install from the skills registry; `skill` (no args) to manage every installed skill with the keyboard. TTY-only; agents & CI stay non-interactive.
-- ⭐ **Default skills** — mark skills to auto-load on every agent session start.
+- ⭐ **Default skills** — one global list: active by default in every project AND auto-loaded on session start.
 - 🖥️ **Cross-platform** — Windows, macOS, Linux (handles the Windows `npx` spawn quirk for you).
 - 🧪 **Well tested** — 225 unit + CLI tests, network-free by default.
 
@@ -58,9 +58,9 @@ That's it. Your agent now knows: *when the user types `/X`, run `skill trigger X
 ```
 ~/.skill-cli/
   store/<skill>/SKILL.md     ← one canonical store (skills live here)
-  config.yaml                ← global config (enabled_global, defaults_global)
+  config.yaml                ← global defaults (active by default + auto-load)
 
-<project>/skill.config       ← per-project activation + defaults (inherit / deny / allow / defaults)
+<project>/skill.config       ← per-project overrides (inherit / deny / allow)
 ~/.claude/CLAUDE.md          ← bootstrap block injected by `skill init -g`
 ~/.codex/AGENTS.md             (idempotent — preserves your existing content)
 ~/.gemini/GEMINI.md
@@ -79,10 +79,10 @@ short bootstrap block telling it to run `skill` on `/X`.
 | `skill install <source>` | Fetch skill(s) to the store (agent dirs untouched) |
 | `skill search` | Interactive search & multi-install from the skills registry (TTY) |
 | `skill` / `skill manager` | Interactive manager: toggle, default, delete, view (TTY) |
-| `skill enable <name> [-g]` | Enable in project, or globally with `-g` |
-| `skill disable <name> [-g]` | Disable |
-| `skill default <name> [-g]` | Mark a skill to auto-load on session start |
-| `skill undefault <name> [-g]` | Remove the auto-load flag |
+| `skill enable <name> [-g]` | Allow in project, or global default with `-g` |
+| `skill disable <name> [-g]` | Deny in project, or remove global default with `-g` |
+| `skill default <name>` | Mark a default skill (global: active + auto-load) |
+| `skill undefault <name>` | Remove the default flag |
 | `skill defaults` | List default skills (the command your agent runs on start) |
 | `skill list` | Show installed + active skills (cwd-aware, ★ = default) |
 | `skill show <name>` | Skill metadata (path, triggers, version) |
@@ -130,23 +130,26 @@ for a minimal, copy-paste template.
 
 ## Activation
 
-Three layers, most-specific wins:
+One global concept, refined per project:
 
 1. **installed** — present in the store (passive)
-2. **enabled globally** — listed in `config.yaml`; active by default in every project
-3. **enabled per project** — in the project's `skill.config` `allow` list
+2. **default (global)** — listed in `config.yaml` `defaults:`; **active by default in every project** and **auto-loaded on agent session start**. Mark one with `skill default <name>` (or `skill enable -g`).
+3. **per-project override** — a project's `skill.config` refines the set:
+   - `allow` — activate an otherwise-passive skill **in this project only**
+   - `deny` — turn off a default skill **in this project only**
+   - `inherit: false` — ignore global defaults entirely (only `allow` applies)
 
-A project `skill.config` overrides the global set. Pure allowlist mode:
+A project with **no `skill.config`** inherits the global defaults (all active). Pure
+allowlist mode in a single project:
 
 ```yaml
 # <project>/skill.config
-inherit: true
-deny: ["*"]                    # block every globally-enabled skill in this project
-allow: [react-best-practices]  # then open them one by one
+inherit: false                 # ignore global defaults in this project
+allow: [react-best-practices]  # only this skill is active here
 ```
 
-> `allow` always wins over `deny`, so `deny: ["*"]` + `allow: [X]` = "only X".
-> Matching is case-insensitive throughout.
+> `allow` always wins over `deny`, so with `inherit: true` you can also write
+> `deny: ["*"]` + `allow: [X]` = "only X here". Matching is case-insensitive throughout.
 
 ## Interactive mode (terminal only)
 
@@ -161,7 +164,7 @@ Opens a full-screen manager over your store:
 |---|---|
 | `↑` / `↓` | move |
 | `space` | toggle active in the current project |
-| `a` | toggle the default (auto-load) flag |
+| `a` | toggle the global default (active + auto-load) |
 | `d` | delete (asks `y/N`) |
 | `enter` | view the `SKILL.md` |
 | `q` / `esc` | quit |
@@ -173,15 +176,20 @@ Type a query → browse live results from the [skills registry](https://skills.s
 → loops back so you can search again. `esc` or an empty query quits. `skill install`
 with no source also opens it.
 
-## Default skills (auto-load)
+## Default skills
 
-A "default" is a skill your agent loads automatically on every session start.
-It's a flag **independent** of enable/disable (a skill can be a default without
-being active). Mark one with `skill default <name>` (or `-g` for every project),
-list them with `skill defaults`. The AGENTS.md bootstrap block tells your agent to
-run `skill defaults` then `skill cat <name>` for each.
+A **default** is a skill that is **active by default in every project** AND
+**auto-loaded on agent session start** — one unified global list in `config.yaml`
+(`defaults:`). Mark one with `skill default <name>`, remove with
+`skill undefault <name>`, list them with `skill defaults`. The AGENTS.md bootstrap
+block tells your agent to run `skill defaults` on start, then `skill cat <name>`
+for each.
 
-Defaults live in `skill.config` (`defaults:`) and `config.yaml` (`defaults_global:`).
+Defaults are a **global** concept (never per-project). A project can still turn a
+default off locally with `skill disable <name>` (a project `deny`), or activate a
+non-default locally with `skill enable <name>` (a project `allow`) — see
+[Activation](#activation). In the interactive manager, `a` toggles the global
+default; `space` toggles the per-project override.
 
 ## Bootstrap
 

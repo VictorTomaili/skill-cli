@@ -4,7 +4,7 @@ import { computeEffective, computeDefaults } from '../../src/lib/config.js'
 
 // build an installed-store entry the way listStore() does
 const sk = (name) => ({ name, dir: name, description: '', version: '1', triggers: [], path: '' })
-const G = (enabled_global) => ({ enabled_global })
+const G = (defaults) => ({ defaults })
 const P = (projCfg) => ({ inherit: true, deny: [], allow: [], ...projCfg })
 
 // ── no project config: pure global ──────────────────────────────────────────
@@ -102,28 +102,26 @@ test('output is sorted', () => {
   assert.deepEqual(computeEffective(inst, G(['c', 'a', 'b']), null), ['a', 'b', 'c'])
 })
 
-// ── computeDefaults (auto-load flag; an axis INDEPENDENT of enable/deny) ──────
-const GD = (defaults_global) => ({ defaults_global })
+// ── computeDefaults (defaults ARE the active-by-default set; GLOBAL only) ────────
+const GD = (defaults) => ({ defaults })
 
-test('computeDefaults: no project → global defaults', () => {
-  assert.deepEqual(computeDefaults([sk('a'), sk('b')], GD(['a']), null), ['a'])
+test('computeDefaults: returns the global defaults list (installed-filtered)', () => {
+  assert.deepEqual(computeDefaults([sk('a'), sk('b')], GD(['a'])), ['a'])
 })
-test('computeDefaults: empty global + no project → []', () => {
-  assert.deepEqual(computeDefaults([sk('a')], GD([]), null), [])
-})
-test('computeDefaults: project defaults merge with inherited global', () => {
-  assert.deepEqual(computeDefaults([sk('a'), sk('b'), sk('c')], GD(['a']), P({ defaults: ['c'] })), ['a', 'c'])
-})
-test('computeDefaults: inherit=false → global defaults ignored', () => {
-  assert.deepEqual(computeDefaults([sk('a'), sk('b')], GD(['a']), P({ inherit: false, defaults: ['b'] })), ['b'])
+test('computeDefaults: empty global → []', () => {
+  assert.deepEqual(computeDefaults([sk('a')], GD([])), [])
 })
 test('computeDefaults: only installed skills resolve (ghost dropped)', () => {
-  assert.deepEqual(computeDefaults([sk('a')], GD(['a', 'ghost']), null), ['a'])
+  assert.deepEqual(computeDefaults([sk('a')], GD(['a', 'ghost'])), ['a'])
 })
 test('computeDefaults: case-insensitive, canonical, sorted', () => {
-  assert.deepEqual(computeDefaults([sk('React-BP'), sk('vue')], GD(['react-bp']), P({ defaults: ['VUE'] })), ['React-BP', 'vue'])
+  assert.deepEqual(computeDefaults([sk('React-BP'), sk('vue')], GD(['react-bp', 'VUE'])), ['React-BP', 'vue'])
 })
-test('computeDefaults: independent of deny (a denied skill can still default)', () => {
-  // deny governs active state; the default flag is a separate axis
-  assert.deepEqual(computeDefaults([sk('a')], GD(['a']), P({ deny: ['*'] })), ['a'])
+test('computeDefaults: ignores project deny (defaults are global; deny governs active only)', () => {
+  assert.deepEqual(computeDefaults([sk('a')], GD(['a'])), ['a'])
+})
+test('computeDefaults: ignores the project config entirely (defaults are global-only)', () => {
+  // a project with inherit:false / allow / deny must NOT change the defaults list
+  const proj = { inherit: false, allow: ['x'], deny: ['*'] }
+  assert.deepEqual(computeDefaults([sk('a'), sk('x')], GD(['a']), proj), ['a'])
 })

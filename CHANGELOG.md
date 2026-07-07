@@ -7,12 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- `skill init -g` now bootstraps **pi** too — the AGENTS.md block is injected into `~/.pi/agent/AGENTS.md` (pi's global context file). Claude Code, Codex, Gemini, and pi are now all bootstrapped on a single re-run.
-
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
+
+## [0.4.0] - 2026-07-07
+
+### Changed (breaking — config format)
+- **Unified the "default" and "enabled" concepts into ONE global list.** Previously there were two independent global lists — `enabled_global` (skills active by default in every project) and `defaults_global` (skills auto-loaded on session start, independent of active state). Now there is a single `defaults` list in `config.yaml`: a default skill is BOTH active by default in every project AND auto-loaded on session start. This dissolves the confusion where the manager used a hidden `deny` to turn off a global skill — a default is simply the active-by-default set, and a project refines it with `allow` / `deny`.
+  - `skill default <name>` is now always GLOBAL (the `-g` flag is accepted but a no-op). `skill enable -g <name>` and `skill default <name>` now do the same thing; `skill disable -g` / `skill undefault` remove it.
+  - The per-project `defaults:` key in `skill.config` is removed — defaults are a global concept only. A project refines the active set with `allow` / `deny` / `inherit` (see Activation).
+  - **Automatic migration:** a legacy `config.yaml` with `enabled_global:` and/or `defaults_global:` is folded into `defaults:` (the union of both, deduped) on the next write. No manual steps.
+- AGENTS.md bootstrap block: the "Defaults" line now describes the unified model (active by default + auto-load, global).
+
+### Added
+- `skill init -g` now bootstraps **pi** too — the AGENTS.md block is injected into `~/.pi/agent/AGENTS.md` (pi's global context file). Claude Code, Codex, Gemini, and pi are now all bootstrapped on a single re-run.
 
 ## [0.3.0] - 2026-07-07
 

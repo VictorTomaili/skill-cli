@@ -1,19 +1,19 @@
 import c from 'picocolors'
 import { listStore } from '../lib/store.js'
-import { readGlobalConfig, writeGlobalConfig, readProjectConfig, writeProjectConfig, computeDefaults } from '../lib/config.js'
+import { readGlobalConfig, writeGlobalConfig, computeDefaults } from '../lib/config.js'
 import { trunc } from '../lib/format.js'
 
-// `skill defaults` — list the skills marked as defaults (auto-loaded on agent
-// session start). This is the agent-facing command the AGENTS.md block tells the
-// agent to run, then `skill cat <name>` for each. cwd-aware (global + project).
+// `skill defaults` — list the skills marked as defaults. In the unified model a
+// default skill is BOTH active-by-default in every project AND auto-loaded on
+// agent session start (one global `defaults` list). This is the agent-facing
+// command the AGENTS.md block tells the agent to run, then `skill cat <name>`
+// for each. Defaults are a GLOBAL concept (never per-folder).
 export function cmdDefaults() {
   const installed = listStore()
   const globalCfg = readGlobalConfig()
-  const projCfg = readProjectConfig()
-  const eff = computeDefaults(installed, globalCfg, projCfg)
+  const eff = computeDefaults(installed, globalCfg)
 
-  const scope = projCfg ? c.magenta(process.cwd()) : c.gray('(global)')
-  console.log(c.bold('skill defaults') + c.gray(' — auto-load on session start · project: ') + scope)
+  console.log(c.bold('skill defaults') + c.gray(' — active by default + auto-load on session start (global)'))
   console.log()
 
   if (eff.length === 0) {
@@ -31,14 +31,15 @@ export function cmdDefaults() {
   console.log(c.gray('Load each into context: ') + c.cyan('skill cat <name>'))
 }
 
-// `skill default <name> [-g]` — mark a skill as a default (auto-load). Requires
-// the skill to be installed (a typo would silently "succeed" but never resolve).
+// `skill default <name>` — mark a skill as a default (active by default in every
+// project + auto-loaded on session start). Always GLOBAL. Requires the skill to
+// be installed (a typo would silently "succeed" but never resolve). `-g`/`--global`
+// is accepted for compatibility but is a no-op — defaults are inherently global.
 export function cmdDefault(args) {
-  const global = args.includes('-g') || args.includes('--global')
   const name = args.find(a => !a.startsWith('-'))
   if (!name) {
-    console.error(c.red('Usage: skill default <name> [-g]'))
-    console.error(c.gray('  Marks a skill as a default (auto-loaded on agent session start).'))
+    console.error(c.red('Usage: skill default <name>'))
+    console.error(c.gray('  Marks a skill as a default: active by default in every project + auto-load on session start.'))
     process.exit(1)
   }
   if (!listStore().some(s => s.name.toLowerCase() === name.toLowerCase())) {
@@ -46,47 +47,27 @@ export function cmdDefault(args) {
     console.error(c.gray('  Install first: skill install <source>'))
     process.exit(1)
   }
-  if (global) {
-    const cfg = readGlobalConfig()
-    if (!(cfg.defaults_global || []).some(d => d.toLowerCase() === name.toLowerCase())) {
-      cfg.defaults_global.push(name.toLowerCase())
-      cfg.defaults_global.sort()
-    }
-    writeGlobalConfig(cfg)
-    console.log(c.green('✓') + ' default globally: ' + c.bold(name) + c.gray('  (auto-load in every project)'))
-  } else {
-    const cwd = process.cwd()
-    const cfg = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [], defaults: [] }
-    if (!(cfg.defaults || []).some(d => d.toLowerCase() === name.toLowerCase())) cfg.defaults.push(name.toLowerCase())
-    writeProjectConfig(cwd, cfg)
-    console.log(c.green('✓') + ' default in project: ' + c.bold(name) + c.gray('  (' + cwd + ')'))
+  const cfg = readGlobalConfig()
+  if (!(cfg.defaults || []).some(d => d.toLowerCase() === name.toLowerCase())) {
+    cfg.defaults.push(name.toLowerCase())
+    cfg.defaults.sort()
   }
+  writeGlobalConfig(cfg)
+  console.log(c.green('✓') + ' default (global): ' + c.bold(name) + c.gray('  (active + auto-load in every project)'))
 }
 
-// `skill undefault <name> [-g]` — remove the default flag.
+// `skill undefault <name>` — remove the default flag (always global).
 export function cmdUndefault(args) {
-  const global = args.includes('-g') || args.includes('--global')
   const name = args.find(a => !a.startsWith('-'))
   if (!name) {
-    console.error(c.red('Usage: skill undefault <name> [-g]'))
+    console.error(c.red('Usage: skill undefault <name>'))
     process.exit(1)
   }
-  if (global) {
-    const cfg = readGlobalConfig()
-    const had = (cfg.defaults_global || []).some(d => d.toLowerCase() === name.toLowerCase())
-    cfg.defaults_global = (cfg.defaults_global || []).filter(d => d.toLowerCase() !== name.toLowerCase())
-    writeGlobalConfig(cfg)
-    console.log(had
-      ? (c.green('✓') + ' removed global default: ' + c.bold(name))
-      : (c.gray('·') + ' not a global default: ' + c.bold(name) + c.gray(' (nothing to do)')))
-  } else {
-    const cwd = process.cwd()
-    const cfg = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [], defaults: [] }
-    const had = (cfg.defaults || []).some(d => d.toLowerCase() === name.toLowerCase())
-    cfg.defaults = (cfg.defaults || []).filter(d => d.toLowerCase() !== name.toLowerCase())
-    writeProjectConfig(cwd, cfg)
-    console.log(had
-      ? (c.green('✓') + ' removed project default: ' + c.bold(name))
-      : (c.gray('·') + ' not a project default: ' + c.bold(name) + c.gray(' (nothing to do)')))
-  }
+  const cfg = readGlobalConfig()
+  const had = (cfg.defaults || []).some(d => d.toLowerCase() === name.toLowerCase())
+  cfg.defaults = (cfg.defaults || []).filter(d => d.toLowerCase() !== name.toLowerCase())
+  writeGlobalConfig(cfg)
+  console.log(had
+    ? (c.green('✓') + ' removed default: ' + c.bold(name))
+    : (c.gray('·') + ' not a default: ' + c.bold(name) + c.gray(' (nothing to do)')))
 }

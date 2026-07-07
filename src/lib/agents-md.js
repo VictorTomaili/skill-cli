@@ -19,9 +19,9 @@ Usage:
 - \`skill show <name>\` — skill summary (path, triggers, version)
 - \`skill cat <name>\` — load skill content into context
 
-Defaults: on session start, run \`skill defaults\` to list skills marked for
-auto-load, then \`skill cat <name>\` for each. Mark your own with
-\`skill default <name>\` (or \`-g\` for every project).
+Defaults: on session start, run \`skill defaults\` to list skills marked as
+defaults (active by default + auto-load), then \`skill cat <name>\` for each. Mark
+your own with \`skill default <name>\` (global — active in every project).
 
 Triggers: when the user types \`/X\`, run \`skill trigger X\`.
 - Single match → apply the output directly.
