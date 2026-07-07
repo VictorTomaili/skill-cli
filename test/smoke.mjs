@@ -126,6 +126,18 @@ console.log('N3: path traversal rejected (store.js)')
   ok('cat "../etc/passwd" rejected', CLI(['cat', '../etc/passwd']).code !== 0)
 }
 
+console.log('M2: BOM-prefixed SKILL.md (Windows regression)')
+{
+  // write directly into the store (an editor that saves with a BOM); npx itself
+  // rejects a BOM at fetch time, but a hand-edited store skill must still parse.
+  const dir = path.join(HOME, '.skill-cli', 'store', 'bom-test')
+  fs.mkdirSync(dir, { recursive: true })
+  const md = '---\nname: bom-test\ndescription: BOM test\nversion: 1.0.0\ntriggers: [bomcheck]\n---\n# BOM Skill\nbody.\n'
+  fs.writeFileSync(path.join(dir, 'SKILL.md'), '\uFEFF' + md)
+  CLI(['enable', 'bom-test', '-g'])
+  ok('BOM triggers parsed (frontmatter read)', /BOM Skill/.test(strip(CLI(['trigger', 'bomcheck']).out)))
+}
+
 console.log('update detects change + idempotent')
 {
   fs.writeFileSync(path.join(src1, 'SKILL.md'),

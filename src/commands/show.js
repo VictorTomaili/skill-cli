@@ -1,5 +1,6 @@
 import c from 'picocolors'
 import { readSkill } from '../lib/store.js'
+import { getTriggers } from '../lib/frontmatter.js'
 
 export function cmdShow(args) {
   const name = args[0]
@@ -11,7 +12,7 @@ export function cmdShow(args) {
   if (s.data.description) console.log(c.gray(s.data.description))
   console.log()
   console.log(c.gray('path:     ') + s.path)
-  const trg = s.data.triggers ? [].concat(s.data.triggers).map(t => '/' + t).join(', ') : '—'
+  const trg = getTriggers(s.data).map(t => '/' + t).join(', ') || '—'
   console.log(c.gray('triggers: ') + trg)
   console.log(c.gray('content:  ') + c.cyan('skill cat ' + s.name))
 }

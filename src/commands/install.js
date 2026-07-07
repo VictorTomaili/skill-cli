@@ -52,21 +52,26 @@ export function cmdInstall(args) {
         } catch { /* fall back to dir name */ }
       }
       const dest = path.join(STORE_DIR, name)
+      const reinstalled = fs.existsSync(dest)
       fs.rmSync(dest, { recursive: true, force: true })
       // cpSync (not renameSync): rename fails across volumes (EXDEV: C: temp → S: store).
       fs.cpSync(srcSkillDir, dest, { recursive: true })
       // remember the source so `skill update` can re-fetch it later
       fs.writeFileSync(path.join(dest, '.source'), resolved + '\n')
-      moved.push(name)
+      moved.push({ name, reinstalled })
     }
 
     if (moved.length === 0) {
       // throw (not process.exit) so the finally cleans up the temp dir
       throw new Error('No skills moved to store.')
     }
-    console.log(c.green(`✓ Installed ${moved.length} skill(s) to store:`))
-    for (const n of moved) {
-      console.log('  ' + c.green('•') + ' ' + c.bold(n) + c.gray('  → ' + path.join(STORE_DIR, n)))
+    const fresh = moved.filter(m => !m.reinstalled).length
+    const re = moved.length - fresh
+    console.log(c.green(`✓ ${fresh} installed` + (re ? c.gray(` · ${re} reinstalled`) : '') + ' to store:'))
+    for (const m of moved) {
+      const mark = m.reinstalled ? c.yellow('↻') : c.green('•')
+      const tail = m.reinstalled ? c.gray('  (reinstalled)') : c.gray('  → ' + path.join(STORE_DIR, m.name))
+      console.log('  ' + mark + ' ' + c.bold(m.name) + tail)
     }
     console.log()
     console.log(c.gray('Skills are passive until enabled. Activate with: ') + c.cyan('skill enable <name>') + c.gray(' or ') + c.cyan('-g'))

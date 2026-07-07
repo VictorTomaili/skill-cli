@@ -27,7 +27,7 @@ export function cmdTrigger(args) {
   }
 
   if (candidates.length === 1) {
-    const s = readSkill(candidates[0].dir)
+    const s = readSkill(candidates[0].name)
     console.log(c.green('▼ skill: ') + c.bold(s.name) + c.gray('  (triggered: /' + keyword + ')'))
     console.log(c.gray('━'.repeat(56)))
     console.log(s.body.trim())

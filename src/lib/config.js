@@ -11,12 +11,14 @@ const DEFAULT_GLOBAL = {
 }
 
 export function readGlobalConfig() {
-  try {
-    const raw = fs.readFileSync(GLOBAL_CONFIG, 'utf8')
-    return { ...DEFAULT_GLOBAL, ...(yaml.parse(raw) || {}) }
-  } catch {
+  let raw
+  try { raw = fs.readFileSync(GLOBAL_CONFIG, 'utf8') } catch { return { ...DEFAULT_GLOBAL } }
+  let parsed
+  try { parsed = yaml.parse(raw) } catch (e) {
+    process.stderr.write('skill-cli config: parse error (' + (e.message || e) + ') — using defaults\n')
     return { ...DEFAULT_GLOBAL }
   }
+  return { ...DEFAULT_GLOBAL, ...(parsed || {}) }
 }
 
 export function writeGlobalConfig(cfg) {

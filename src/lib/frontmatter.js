@@ -2,6 +2,9 @@ import yaml from 'yaml'
 
 // SKILL.md = YAML frontmatter + markdown body. Faithful to the npx skills standard.
 export function parseSkillMd(content) {
+  // strip a leading UTF-8 BOM — Windows editors often save with one, and it would
+  // break the `^---` frontmatter match (silently dropping name/triggers/version).
+  if (content.charCodeAt(0) === 0xFEFF) content = content.slice(1)
   const m = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
   if (!m) return { data: {}, body: content }
   let data = {}
