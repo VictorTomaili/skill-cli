@@ -12,9 +12,10 @@ export function parseSkillMd(content) {
   return { data, body: m[2] || '' }
 }
 
-// "/Research", "Research", "research" → "research"
+// "/Research", "Research", "research" → "research". Trim BEFORE stripping the
+// leading slash, so comma-split entries like " /code" also normalize.
 export function normalizeTrigger(t) {
-  return String(t).replace(/^\/+/, '').trim().toLowerCase()
+  return String(t).trim().replace(/^\/+/, '').toLowerCase()
 }
 
 // frontmatter.triggers → normalized array

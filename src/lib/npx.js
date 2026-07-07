@@ -10,6 +10,12 @@ import os from 'node:os'
 // shell:false + args array (no injection). On Windows, Node 20+ refuses to spawn
 // .cmd without a shell, so we route through `cmd.exe /c` which resolves npx.
 export function fetchSkillsToTemp(source) {
+  // Test seam: when SKILL_CLI_FETCH_FIXTURE is set, copy a local fixture tree
+  // instead of spawning npx. Lets install/update run with zero network.
+  // Production never sets this env var.
+  const fixture = process.env.SKILL_CLI_FETCH_FIXTURE
+  if (fixture) return fetchFromFixture(fixture)
+
   const safe = String(source ?? '').trim()
   if (!safe) throw new Error('empty source')
   if (/[\r\n]/.test(safe)) throw new Error('source must be a single line')
@@ -46,6 +52,21 @@ export function fetchSkillsToTemp(source) {
   if (!fs.existsSync(fetchedDir)) {
     fs.rmSync(tmp, { recursive: true, force: true })
     throw new Error('no skills found in source after fetch')
+  }
+  return { tmp, fetchedDir }
+}
+
+// Fixture-backed fetch. The fixture is a dir of skill dirs — the same layout npx
+// produces under .claude/skills/. Mirror it into a temp so install/update behave
+// identically to the real path, with no network.
+function fetchFromFixture(fixture) {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-cli-'))
+  const fetchedDir = path.join(tmp, '.claude', 'skills')
+  fs.mkdirSync(fetchedDir, { recursive: true })
+  if (fs.existsSync(fixture)) {
+    for (const entry of fs.readdirSync(fixture, { withFileTypes: true })) {
+      if (entry.isDirectory()) fs.cpSync(path.join(fixture, entry.name), path.join(fetchedDir, entry.name), { recursive: true })
+    }
   }
   return { tmp, fetchedDir }
 }

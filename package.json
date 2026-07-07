@@ -11,7 +11,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node test/smoke.mjs"
+    "test": "node --test",
+    "test:lib": "node --test test/lib",
+    "test:cli": "node --test test/cli"
   },
   "dependencies": {
     "picocolors": "^1.1.1",
