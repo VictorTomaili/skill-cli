@@ -22,8 +22,26 @@ import os from 'node:os'
 // as a single argv element — no shell injection — and `--skill *` stays literal
 // (cmd.exe does no globbing and no POSIX shell is ever involved). npx must be on
 // PATH; it ships with node/npm on every platform.
+// Detect a `@skill` pin on the source (skills ecosystem: owner/repo@skill or a
+// URL@skill). SSH git URLs (`git@host:owner/repo`) start with git@ and are NOT a
+// pin. When the source is pinned we must NOT pass `--skill '*'` — that flag
+// overrides the pin and fetches every skill in the repo (verified), so a search
+// result like owner/repo@research would otherwise dump the whole repo.
+export function skillPin(source) {
+  if (typeof source !== 'string') return null
+  if (source.startsWith('git@')) return null
+  const at = source.lastIndexOf('@')
+  if (at <= 0) return null
+  const skill = source.slice(at + 1)
+  if (!skill || skill.includes('/') || skill.includes(':')) return null
+  return skill
+}
+
 export function buildNpxSpawn(source, platform = process.platform) {
-  const base = ['-y', 'skills', 'add', source, '--copy', '--agent', 'claude-code', '--skill', '*', '-y']
+  // pinned source (owner/repo@skill) → let the @pin select the skill (passing
+  // --skill '*' here would override it and grab the whole repo). Otherwise fetch all.
+  const skillArgs = skillPin(source) ? [] : ['--skill', '*']
+  const base = ['-y', 'skills', 'add', source, '--copy', '--agent', 'claude-code', ...skillArgs, '-y']
   return platform === 'win32'
     ? { cmd: 'cmd.exe', args: ['/c', 'npx', ...base] }
     : { cmd: 'npx', args: base }

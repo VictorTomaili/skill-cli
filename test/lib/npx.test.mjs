@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { fetchSkillsToTemp, buildNpxSpawn } from '../../src/lib/npx.js'
+import { fetchSkillsToTemp, buildNpxSpawn, skillPin } from '../../src/lib/npx.js'
 
 // validation guards run BEFORE mkdtemp/exec, so these never touch the network
 test('empty source throws', () => {
@@ -128,4 +128,41 @@ test('buildNpxSpawn: two -y flags (npx install + skills add prompts)', () => {
 test('buildNpxSpawn: defaults to current process.platform', () => {
   // same shape whether platform is passed or omitted (uses process.platform)
   assert.equal(buildNpxSpawn('x').cmd, buildNpxSpawn('x', process.platform).cmd)
+})
+
+// ── @skill pin handling (search → install must fetch ONE skill, not the repo) ──
+test('skillPin: owner/repo@skill → skill name', () => {
+  assert.equal(skillPin('mattpocock/skills@research'), 'research')
+  assert.equal(skillPin('firecrawl/firecrawl-workflows@firecrawl-deep-research'), 'firecrawl-deep-research')
+})
+
+test('skillPin: git@ SSH URL → null (not a pin)', () => {
+  assert.equal(skillPin('git@github.com:owner/repo.git'), null)
+})
+
+test('skillPin: no @ / URL → null', () => {
+  assert.equal(skillPin('owner/repo'), null)
+  assert.equal(skillPin('https://github.com/owner/repo'), null)
+})
+
+test('skillPin: trailing segment with slash/colon is not a bare skill name → null', () => {
+  assert.equal(skillPin('owner/repo@a/b'), null)
+  assert.equal(skillPin('owner/repo@https://x'), null)
+})
+
+test('buildNpxSpawn: pinned source omits --skill (the @pin selects it; * would grab the repo)', () => {
+  for (const p of ['win32', 'linux', 'darwin']) {
+    const { args } = buildNpxSpawn('mattpocock/skills@research', p)
+    assert.ok(!args.includes('--skill'), p)
+    assert.ok(!args.includes('*'), p + ' no glob')
+    assert.ok(args.includes('mattpocock/skills@research'), p + ' source verbatim')
+  }
+})
+
+test('buildNpxSpawn: non-pinned source still passes --skill * (fetch all)', () => {
+  for (const p of ['win32', 'linux']) {
+    const { args } = buildNpxSpawn('vercel-labs/agent-skills', p)
+    assert.ok(args.includes('--skill'), p)
+    assert.ok(args.includes('*'), p)
+  }
 })

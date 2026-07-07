@@ -5,6 +5,7 @@ import { STORE_DIR } from '../lib/paths.js'
 import { listStore } from '../lib/store.js'
 import { readGlobalConfig, writeGlobalConfig, readProjectConfig, writeProjectConfig } from '../lib/config.js'
 import { pad } from '../lib/format.js'
+import { isInteractive } from '../lib/interactive.js'
 
 // Read one line from stdin (fd 0) synchronously. Only ever called when stdin is
 // a TTY (or SKILL_CLI_FORCE_TTY is set), so it blocks for the user's keystrokes.
@@ -27,14 +28,6 @@ function confirm(question) {
   process.stdout.write(question)
   const a = readLine().toLowerCase()
   return a === 'y' || a === 'yes'
-}
-
-// Are we talking to a human at a terminal? Agents, CI, and pipes have a non-TTY
-// stdin and must NOT be prompted (they would hang waiting for input that never
-// arrives). SKILL_CLI_FORCE_TTY lets tests exercise the prompt branch by piping
-// an answer on a non-TTY stdin.
-function isInteractive() {
-  return process.stdin.isTTY === true || process.env.SKILL_CLI_FORCE_TTY === '1'
 }
 
 // `skill remove <name>... [-y|--yes|-f|--force]`

@@ -10,6 +10,8 @@ import { cmdDisable } from './commands/disable.js'
 import { cmdInstall } from './commands/install.js'
 import { cmdUpdate } from './commands/update.js'
 import { cmdRemove } from './commands/remove.js'
+import { cmdSearch } from './commands/search.js'
+import { isInteractive } from './lib/interactive.js'
 import { VERSION } from './lib/version.js'
 
 const HELP = `${c.bold('skill')} ${c.gray('v' + VERSION)} — cross-agent skill manager
@@ -21,6 +23,7 @@ ${c.bold('Setup')}
 
 ${c.bold('Acquire skills')}
   ${c.cyan('skill install')} ${c.gray('<source>')}    fetch to store via npx skills (agent dirs untouched)
+  ${c.cyan('skill search')}                  interactive search & multi-install (TTY only)
 
 ${c.bold('Activation')}
   ${c.cyan('skill enable')} ${c.gray('<name> [-g]')}  enable in project, or globally (-g)
@@ -46,13 +49,25 @@ ${c.bold('★ Enjoying skill-cli?')} ${c.gray('Star the repo — it helps others
 
 const [, , cmd, ...rest] = process.argv
 
-try {
+async function main() {
   switch (cmd) {
     case undefined:
     case '-h': case '--help': case 'help':
       console.log(HELP); break
     case 'init': cmdInit(rest); break
-    case 'install': case 'add': cmdInstall(rest); break
+    case 'install': case 'add':
+      // No source + a real terminal → interactive search TUI. Agents/CI (non-TTY)
+      // and explicit sources stay non-interactive.
+      if (rest.length === 0 && isInteractive()) { await cmdSearch(rest) }
+      else { cmdInstall(rest) }
+      break
+    case 'search': case 'browse':
+      if (!isInteractive()) {
+        console.error(c.red("'skill search' is interactive — run it in a terminal, or use 'skill install <source>'."))
+        process.exit(1)
+      }
+      await cmdSearch(rest)
+      break
     case 'enable': cmdEnable(rest); break
     case 'disable': cmdDisable(rest); break
     case 'list': case 'ls': cmdList(rest); break
@@ -68,7 +83,9 @@ try {
       console.error(c.gray('  skill --help'))
       process.exit(1)
   }
-} catch (e) {
+}
+
+main().catch(e => {
   console.error(c.red('Error: ') + e.message)
   process.exit(1)
-}
+})

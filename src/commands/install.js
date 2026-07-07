@@ -14,17 +14,10 @@ function resolveSource(source) {
   return source
 }
 
-// Fetch skill(s) from ANY source `npx skills` understands — github owner/repo,
-// full GitHub/GitLab URL, git URL, local path, npm package — into a TEMP cwd,
-// then move the files into our store. Agent folders stay untouched.
-export function cmdInstall(args) {
-  const source = args[0]
-  if (!source) {
-    console.error(c.red('Usage: skill install <source>'))
-    console.error(c.gray('  source: owner/repo | github/gitlab URL | git URL | local path | npm package'))
-    process.exit(1)
-  }
-
+// Fetch skill(s) from `source` into the store. Throws on failure (does NOT
+// process.exit) so callers — the `install` command AND the `search` TUI loop —
+// can decide how to handle errors. Returns the list of moved skill names.
+export function installSource(source) {
   const resolved = resolveSource(source)
   console.log(c.cyan('Fetching: ') + resolved)
   console.log(c.gray('  via npx skills add (temp cwd; agent folders untouched)'))
@@ -33,9 +26,7 @@ export function cmdInstall(args) {
   try {
     ({ tmp, fetchedDir } = fetchSkillsToTemp(resolved))
   } catch (e) {
-    console.error(c.red(e.message))
-    console.error(c.gray('Check the source (owner/repo, URL, path, npm package).'))
-    process.exit(1)
+    throw new Error(e.message)
   }
 
   try {
@@ -84,7 +75,27 @@ export function cmdInstall(args) {
     }
     console.log()
     console.log(c.gray('Skills are passive until enabled. Activate with: ') + c.cyan('skill enable <name>') + c.gray(' or ') + c.cyan('-g'))
+    return moved
   } finally {
     if (tmp) fs.rmSync(tmp, { recursive: true, force: true })
+  }
+}
+
+// `skill install <source>` — non-interactive. The TTY/no-args route to the search
+// TUI is handled in cli.js (avoids a circular import with search.js).
+export function cmdInstall(args) {
+  const source = args[0]
+  if (!source) {
+    console.error(c.red('Usage: skill install <source>'))
+    console.error(c.gray('  source: owner/repo | owner/repo@skill | github/gitlab URL | git URL | local path | npm package'))
+    console.error(c.gray('  (in a terminal with no source → interactive search: skill search)'))
+    process.exit(1)
+  }
+  try {
+    installSource(source)
+  } catch (e) {
+    console.error(c.red(e.message))
+    console.error(c.gray('Check the source (owner/repo, URL, path, npm package).'))
+    process.exit(1)
   }
 }

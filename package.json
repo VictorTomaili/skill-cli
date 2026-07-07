@@ -30,6 +30,7 @@
     "test:e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {
+    "@inquirer/prompts": "^8.5.2",
     "picocolors": "^1.1.1",
     "yaml": "^2.6.0"
   },
