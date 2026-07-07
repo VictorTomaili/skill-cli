@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`skill` (no args) / `skill manager` / `skill ui`** — interactive skill-manager TUI (TTY only). Manage every installed skill from the keyboard: ↑↓ navigate · `space` toggle active in the current project · `d` delete (with confirm) · `enter` view the `SKILL.md` · `q` quit. Agents/CI (non-TTY) never enter it; `skill` with no args on a non-TTY still prints help. Toggle follows the allow/deny model (allow wins; a project deny overrides a global enable).
 - **Default skills — auto-load on session start.** New commands: `skill default <name> [-g]` / `skill undefault <name> [-g]` to mark/unmark, and `skill defaults` to list them (this is the command the agent runs on startup). The AGENTS.md bootstrap block now instructs the agent to run `skill defaults` then `skill cat <name>` for each. Defaults are a flag **independent** of enable/disable (a skill can be a default without being active), stored in `skill.config` `defaults:` (project) and `config.yaml` `defaults_global:` (global). Markable from the CLI, or in the manager via the `a` key (★ marker); `skill list` shows ★ too.
 
+### Fixed
+- `skill search` and the manager now exit on `ESC` (previously only Enter / Ctrl-C worked — the prebuilt `@inquirer` prompts ignore ESC). ESC aborts the active prompt via its `AbortSignal`; the terminal/raw-mode is restored on abort. The manager also quits on `ESC` from the main list.
+
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).

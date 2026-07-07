@@ -8,7 +8,7 @@ import { readGlobalConfig, readProjectConfig, writeProjectConfig, computeEffecti
 import { cleanConfig } from './remove.js'
 import { trunc } from '../lib/format.js'
 
-const KEYS = c.gray('↑↓ move · space toggle · a default · d delete · enter view · q quit')
+const KEYS = c.gray('↑↓ move · space toggle · a default · d delete · enter view · q/esc quit')
 
 // where a skill's activation currently comes from (mirrors `skill list`)
 function labelScope(name, g, p) {
@@ -140,7 +140,7 @@ const managerPrompt = createPrompt((_config, done) => {
     else if (key.name === 'a') { if (s) { setStatus(toggleDefault(s.name)); setTick(tick + 1) } }
     else if (key.name === 'd') { if (s) { setMode('confirm'); setStatus('') } }
     else if (isEnterKey(key)) { if (s) { setMode('view'); setStatus('') } }
-    else if (key.name === 'q' || (key.ctrl && key.name === 'c')) done()
+    else if (key.name === 'q' || key.name === 'escape' || (key.ctrl && key.name === 'c')) done()
   })
 
   // ── render ──
