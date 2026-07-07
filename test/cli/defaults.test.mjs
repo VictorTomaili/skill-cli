@@ -11,7 +11,7 @@ test('defaults: none yet → hint message', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   const r = run(h, ['defaults'])
   assert.equal(r.code, 0)
-  assert.match(strip(r.out), /No default skills/)
+  assert.match(strip(r.out), /No skills installed/)
 })
 
 test('default <name>: not installed → error, exit non-zero', () => {
@@ -45,7 +45,10 @@ test('undefault <name> -g → removed from defaults', () => {
   putStoreSkill(h, 'alpha')
   run(h, ['default', 'alpha', '-g'])
   run(h, ['undefault', 'alpha', '-g'])
-  assert.match(strip(run(h, ['defaults']).out), /No default skills/)
+  const out = strip(run(h, ['defaults']).out)
+  const alphaRow = out.split('\n').find(l => /alpha/.test(l))
+  assert.ok(alphaRow)                       // catalog still lists the skill
+  assert.doesNotMatch(alphaRow, /★/)       // but it's no longer a default
 })
 
 test('undefault when not a default → graceful no-op', () => {
@@ -76,8 +79,29 @@ test('AGENTS.md block documents start gate + discovery + context-altering rules'
   assert.match(md, /skill default <name>/)
   assert.match(md, /START GATE/)
   assert.match(md, /BEFORE ANYTHING ELSE/)
+  assert.match(md, /CATALOG/)
+  assert.match(md, /LOADED/)
+  assert.match(md, /PROPOSE/)
+  assert.match(md, /context-altering/i)
   assert.match(md, /Discovery/)
-  assert.match(md, /Context-altering/)
-  assert.match(md, /PROPOSE-ONLY/)
-  assert.match(md, /propose/)
+})
+
+test('skill defaults lists ALL skills with full descriptions (catalog, no body)', () => {
+  const h = mkHome(); run(h, ['init', '-g'])
+  putStoreSkill(h, 'alpha', { description: 'A very long alpha description exceeding the sixty-six char truncation that must appear in FULL.' })
+  putStoreSkill(h, 'beta', { description: 'beta desc' })
+  run(h, ['default', 'alpha', '-g'])   // alpha is a default (★); beta is not
+  const out = strip(run(h, ['defaults']).out)
+  // BOTH skills appear (catalog = all), and the long description is NOT truncated
+  assert.match(out, /alpha/)
+  assert.match(out, /beta/)
+  assert.match(out, /exceeding the sixty-six char truncation that must appear in FULL/)
+  // alpha is starred (default), beta is not
+  const alphaRow = out.split('\n').find(l => /alpha/.test(l))
+  const betaRow = out.split('\n').find(l => /beta/.test(l))
+  assert.match(alphaRow, /★/)
+  assert.doesNotMatch(betaRow, /★/)
+  // no group-split headers — the agent decides, not the tool
+  assert.doesNotMatch(out, /Auto-load/)
+  assert.doesNotMatch(out, /Context-altering/)
 })

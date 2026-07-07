@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.0] - 2026-07-07
+
+### Changed
+- **`skill defaults` is now a description-only catalog.** It lists EVERY installed
+  skill (name + full description + triggers; ★ marks defaults) — never the skill
+  body. The agent reads the catalog and decides per skill: functional for the task
+  → `skill cat <name>`; context-altering (changes HOW the agent responds) → propose
+  and wait for the user's confirmation. This follows the existing SKILL.md standard
+  — no extra frontmatter field is required or expected on any skill.
+- **Context-altering detection is the agent's judgment, from the description.** Any
+  skill can be context-altering (including ones installed later); the agent decides
+  from the description text, with no hardcoded list. (`skill cat` is unchanged — it
+  still loads a full skill on demand.)
+
+### Added
+- AGENTS.md START GATE now enforces **"LOADED ≠ LISTED"**: a skill is loaded only
+  if the agent ran `skill cat <name>` for it this session — listing/cataloging a
+  skill (or its ★ / `active` status) is not loading.
+
 ## [0.5.1] - 2026-07-07
 
 ### Fixed

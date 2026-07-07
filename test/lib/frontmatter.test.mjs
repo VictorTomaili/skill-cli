@@ -69,3 +69,4 @@ test('strips leading slashes + lowercases + trims', () => {
 test('empty input → empty', () => {
   assert.equal(normalizeTrigger(''), '')
 })
+

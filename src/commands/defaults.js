@@ -1,7 +1,6 @@
 import c from 'picocolors'
 import { listStore } from '../lib/store.js'
-import { readGlobalConfig, writeGlobalConfig, computeDefaults } from '../lib/config.js'
-import { trunc } from '../lib/format.js'
+import { readGlobalConfig, writeGlobalConfig } from '../lib/config.js'
 
 // `skill defaults` — list the skills marked as defaults. In the unified model a
 // default skill is BOTH active-by-default in every project AND auto-loaded on
@@ -11,24 +10,31 @@ import { trunc } from '../lib/format.js'
 export function cmdDefaults() {
   const installed = listStore()
   const globalCfg = readGlobalConfig()
-  const eff = computeDefaults(installed, globalCfg)
+  const defs = new Set((globalCfg.defaults || []).map(d => String(d).toLowerCase()))
 
-  console.log(c.bold('skill defaults') + c.gray(' — active by default + auto-load on session start (global)'))
+  console.log(c.bold('skill defaults') + c.gray(' — skill catalog (descriptions only; the agent decides: functional → `skill cat`, context-altering → propose)'))
   console.log()
 
-  if (eff.length === 0) {
-    console.log(c.gray('  No default skills yet. Mark with: ') + c.cyan('skill default <name>'))
+  if (installed.length === 0) {
+    console.log(c.gray('  No skills installed. Install with: ') + c.cyan('skill install <source>'))
     return
   }
 
-  for (const name of eff) {
-    const s = installed.find(x => x.name === name)
-    const trg = s && s.triggers.length ? '  ' + c.gray('/' + s.triggers.join(', /')) : ''
-    console.log(`  ${c.yellow('★')} ${c.bold(name.padEnd(22))}${trg}`)
-    if (s && s.description) console.log(c.gray('      ' + trunc(s.description, 66)))
+  // CATALOG, not a loader: print every installed skill's name + FULL description
+  // (collapsed to one line) + triggers. Never dump the skill body here — the
+  // agent reads descriptions, then itself decides per skill: load (skill cat) if
+  // it's functional for the task, or PROPOSE if it's context-altering (changes
+  // HOW the agent responds). Detection is the agent's judgment from the
+  // description, so it works for any skill — including ones loaded later — with
+  // no hardcoded list or flag.
+  for (const s of installed) {
+    const star = defs.has(s.name.toLowerCase()) ? c.yellow('★') + ' ' : '  '
+    const trg = s.triggers.length ? '  ' + c.gray('/' + s.triggers.join(', /')) : ''
+    console.log(`  ${star}${c.bold(s.name)}${trg}`)
+    if (s.description) console.log(c.gray('      ' + String(s.description).replace(/[\r\n]+/g, ' ').trim()))
   }
   console.log()
-  console.log(c.gray('Load each into context: ') + c.cyan('skill cat <name>'))
+  console.log(c.yellow('★') + c.gray(' = default (active by default). Load a skill: ') + c.cyan('skill cat <name>'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every

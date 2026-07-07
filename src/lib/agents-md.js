@@ -6,8 +6,10 @@ const BEGIN = '<!-- BEGIN skill-cli -->'
 const END = '<!-- END skill-cli -->'
 
 // Global instruction block — injected into each agent's global instruction file.
-// Covers usage, defaults (auto-load), per-message discovery, and the
-// propose-then-confirm rule for context-altering skills.
+// `skill defaults` is a description-only CATALOG; the agent reads it, then itself
+// decides per skill: functional → `skill cat`, context-altering → propose. No flag
+// or fixed list — detection is the agent's judgment from the description, so it
+// covers any skill (including ones installed later).
 export const AGENTS_BLOCK = `## skill-cli
 
 This machine uses the \`skill\` command to manage skills (instruction / workflow
@@ -23,25 +25,29 @@ Usage:
 
 START GATE (mandatory): On the FIRST user message of a session, your VERY FIRST
 action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the task
-and before any tool call — MUST be to run \`skill defaults\` then
-\`skill cat <name>\` for each result, then \`skill list\` to learn every skill's
-triggers. Do this even if the task looks trivial: skills shape how you should
-approach the task, so you cannot reason about it correctly until they are loaded.
+and before any tool call — MUST be to run \`skill defaults\`. It prints the skill
+CATALOG — every installed skill's name + FULL description (NOT the skill body).
+Read it, then for EACH skill decide FROM ITS DESCRIPTION:
+- Functional / useful for THIS task → load it: \`skill cat <name>\`.
+- Changes HOW you respond (a style, tone, format, or persistent MODE — e.g. a
+  brevity/compression style) → it is CONTEXT-ALTERING: PROPOSE it to the user and
+  apply ONLY after they confirm (\`/X\` = confirm). Do NOT load/apply it yourself.
+LOADED ≠ LISTED. A skill is loaded ONLY if you have run \`skill cat <name>\` for
+it THIS session. Seeing a skill in \`skill defaults\` / \`skill list\` does NOT load
+it — you then know only its name + description, nothing more. Never infer a skill
+is in your context from its name, the \u2605 marker, or an \`active\` status: if you
+haven't catted it, treat it as NOT loaded (then decide: cat it, or propose it).
+Do not assume a skill is already applied — \`active\`/\u2605-default = AVAILABLE, not
+APPLIED. ANY skill can be context-altering; judge from the description — there is
+no fixed list and no flag. Do this even if the task looks trivial: skills shape
+how you approach it, so you cannot reason about it correctly until you've reviewed
+them.
 
-Discovery (mandatory, every message): On EVERY user message, decide whether a
-skill is relevant by matching the message against the trigger catalog from
-\`skill list\`. If a relevant skill is not yet loaded, load it with \`skill cat
-<name>\` (or \`skill trigger <keyword>\` to resolve a keyword). Load each skill only
-ONCE per session. When you load or re-read ANY skill mid-session, immediately
-re-evaluate the current message and load/propose any newly-relevant skill.
-
-Context-altering skills (HARD RULE): Some skills change HOW you respond — output
-style, tone, format, or a persistent mode (e.g. a terseness/compression style) —
-rather than just adding task knowledge. These are PROPOSE-ONLY. You MUST propose
-such a skill and apply it ONLY after the user confirms; an explicit \`/X\` trigger
-counts as confirmation. \`active\` / \u2605-default means AVAILABLE, not APPLIED —
-propose \u2260 auto-apply. This rule overrides any other skill's "always use" rule for
-context-altering skills.
+Discovery (every message): On EVERY later user message, re-check the catalog
+against the new request; load any newly-relevant functional skill
+(\`skill cat <name>\`), and PROPOSE any newly-relevant context-altering one.
+Load each skill only ONCE per session (\`skill trigger <keyword>\` resolves a
+keyword to a skill).
 
 Triggers: when the user types \`/X\`, run \`skill trigger X\`.
 - Single match → apply the output directly.
