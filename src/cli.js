@@ -11,11 +11,14 @@ import { cmdInstall } from './commands/install.js'
 import { cmdUpdate } from './commands/update.js'
 import { cmdRemove } from './commands/remove.js'
 import { cmdSearch } from './commands/search.js'
+import { cmdManager } from './commands/manager.js'
 import { isInteractive } from './lib/interactive.js'
 import { VERSION } from './lib/version.js'
 
 const HELP = `${c.bold('skill')} ${c.gray('v' + VERSION)} — cross-agent skill manager
 ${c.gray('Single global store + activation (skill.config) + bootstrap (AGENTS.md).')}
+
+${c.bold('skill')}                  ${c.gray('interactive manager (↑↓ space d enter — TTY only)')}
 
 ${c.bold('Setup')}
   ${c.cyan('skill init -g')}              global setup (store + AGENTS.md injection)
@@ -51,7 +54,17 @@ const [, , cmd, ...rest] = process.argv
 
 async function main() {
   switch (cmd) {
+    case 'manager': case 'ui':
+      if (!isInteractive()) {
+        console.error(c.red("'skill manager' is interactive — run it in a terminal, or use 'skill list'."))
+        process.exit(1)
+      }
+      await cmdManager()
+      break
     case undefined:
+      if (isInteractive()) { await cmdManager() }
+      else { console.log(HELP) }
+      break
     case '-h': case '--help': case 'help':
       console.log(HELP); break
     case 'init': cmdInit(rest); break

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **`skill search` / `skill browse`** — interactive search & multi-install TUI (TTY only). Type a query → browse live `npx skills find` results → mark one or more with `space` → `enter` installs all marked → loops back so you can search again ("research" → pick → "deploy" → pick). `skill install` with no source also opens it on a terminal. Agents/CI (non-TTY) and explicit `skill install <source>` stay fully non-interactive.
 - **`@skill`-pinned sources** (`owner/repo@skill`) now install just that one skill instead of the whole repo (`--skill '*'` is dropped when the source is pinned).
+- **`skill` (no args) / `skill manager` / `skill ui`** — interactive skill-manager TUI (TTY only). Manage every installed skill from the keyboard: ↑↓ navigate · `space` toggle active in the current project · `d` delete (with confirm) · `enter` view the `SKILL.md` · `q` quit. Agents/CI (non-TTY) never enter it; `skill` with no args on a non-TTY still prints help. Toggle follows the allow/deny model (allow wins; a project deny overrides a global enable).
 
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.

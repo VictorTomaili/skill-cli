@@ -91,7 +91,8 @@ export function cmdRemove(args) {
 }
 
 // Drop the skill from the global enabled list and the current project allow-list.
-function cleanConfig(name) {
+// Exported so the interactive manager can reuse it on its `d` (delete) action.
+export function cleanConfig(name) {
   const g = readGlobalConfig()
   if ((g.enabled_global || []).some(a => a.toLowerCase() === name.toLowerCase())) {
     g.enabled_global = (g.enabled_global || []).filter(a => a.toLowerCase() !== name.toLowerCase())
