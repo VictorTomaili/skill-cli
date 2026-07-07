@@ -7,15 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- "Star the repo" call to action in `skill --help` (with the `gh repo star` command) and the README.
-
-### Fixed
-- `skill trigger <name>` now loads a skill by exact name when no `triggers:` keyword matches. Skills without a `triggers:` field (e.g. description-triggered skills imported from the `skills` / `vercel-labs` ecosystem) were previously unreachable via `trigger`. A passive skill matched by name now shows an enable hint (`skill enable` / `skill cat`) instead of a dead-end "No active skill" message.
-
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
+
+## [0.1.1] - 2026-07-07
+
+### Fixed
+- `skill trigger <name>` now loads a skill by exact name when no `triggers:` keyword matches. Skills without a `triggers:` field (e.g. description-triggered skills imported from the `skills` / `vercel-labs` ecosystem) were previously unreachable via `trigger`. A passive skill matched by name now shows an enable hint (`skill enable` / `skill cat`) instead of a dead-end "No active skill" message.
 
 ## [0.1.0] - 2026-07-07
 
@@ -49,5 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Windows `npx` spawn runs with `shell:false` + an args array and rejects sources
   containing shell metacharacters (`& | < > ^`).
 
-[Unreleased]: https://github.com/victortomaili/skill-cli/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/victortomaili/skill-cli/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/victortomaili/skill-cli/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/victortomaili/skill-cli/releases/tag/v0.1.0
