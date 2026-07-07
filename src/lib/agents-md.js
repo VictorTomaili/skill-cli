@@ -6,7 +6,7 @@ const BEGIN = '<!-- BEGIN skill-cli -->'
 const END = '<!-- END skill-cli -->'
 
 // Global instruction block — injected into each agent's global instruction file.
-// `skill defaults` is a description-only CATALOG; the agent reads it, then itself
+// `skill active` (alias: `status`) is a description-only CATALOG of ACTIVE skills;
 // decides per skill: functional → `skill cat`, context-altering → propose. No flag
 // or fixed list — detection is the agent's judgment from the description, so it
 // covers any skill (including ones installed later).
@@ -25,15 +25,15 @@ Usage:
 
 START GATE (mandatory): On the FIRST user message of a session, your VERY FIRST
 action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the task
-and before any tool call — MUST be to run \`skill defaults\`. It prints the skill
-CATALOG — every installed skill's name + FULL description (NOT the skill body).
+and before any tool call — MUST be to run \`skill active\`. It prints the skill
+CATALOG — every ACTIVE skill's name + FULL description (NOT the skill body).
 Read it, then for EACH skill decide FROM ITS DESCRIPTION:
 - Functional / useful for THIS task → load it: \`skill cat <name>\`.
 - Changes HOW you respond (a style, tone, format, or persistent MODE — e.g. a
   brevity/compression style) → it is CONTEXT-ALTERING: PROPOSE it to the user and
   apply ONLY after they confirm (\`/X\` = confirm). Do NOT load/apply it yourself.
 LOADED ≠ LISTED. A skill is loaded ONLY if you have run \`skill cat <name>\` for
-it THIS session. Seeing a skill in \`skill defaults\` / \`skill list\` does NOT load
+it THIS session. Seeing a skill in \`skill active\` / \`skill list\` does NOT load
 it — you then know only its name + description, nothing more. Never infer a skill
 is in your context from its name, the \u2605 marker, or an \`active\` status: if you
 haven't catted it, treat it as NOT loaded (then decide: cat it, or propose it).

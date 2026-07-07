@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.1] - 2026-07-07
+
+### Changed
+- Renamed the agent catalog command `skill defaults` → **`skill active`** (`skill
+  status` is an alias; `skill defaults` is kept as a legacy alias so already-bootstrapped
+  agents keep working). It now lists ONLY the skills active in the current project
+  (defaults + project allow, minus deny) with full descriptions — not every installed
+  skill. `skill default <name>` / `skill undefault <name>` (marking) are unchanged.
+- AGENTS.md START GATE updated to run `skill active` and scope the catalog to
+  active skills.
+
 ## [0.6.0] - 2026-07-07
 
 ### Changed

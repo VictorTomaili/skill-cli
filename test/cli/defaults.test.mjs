@@ -4,14 +4,22 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { mkHome, putStoreSkill, run, strip } from '../helpers.mjs'
 
-// `skill defaults` / `default` / `undefault` — the auto-load flag. Driven via the
-// CLI (the path agents use to mark defaults) against an isolated SKILL_CLI_HOME.
+// `skill active` (aliases: `status`, legacy `defaults`) / `default` / `undefault`.
+// Driven via the CLI against an isolated SKILL_CLI_HOME.
 
-test('defaults: none yet → hint message', () => {
+test('active: none yet → hint message', () => {
   const h = mkHome(); run(h, ['init', '-g'])
-  const r = run(h, ['defaults'])
+  const r = run(h, ['active'])
   assert.equal(r.code, 0)
-  assert.match(strip(r.out), /No skills installed/)
+  assert.match(strip(r.out), /No active skills/)
+})
+
+test('active: `status` and legacy `defaults` are aliases', () => {
+  const h = mkHome(); run(h, ['init', '-g'])
+  putStoreSkill(h, 'alpha', { description: 'alpha desc' })
+  run(h, ['default', 'alpha', '-g'])
+  assert.match(strip(run(h, ['status']).out), /alpha/)
+  assert.match(strip(run(h, ['defaults']).out), /alpha/)   // legacy alias
 })
 
 test('default <name>: not installed → error, exit non-zero', () => {
@@ -21,11 +29,11 @@ test('default <name>: not installed → error, exit non-zero', () => {
   assert.match(strip(r.err + r.out), /Not installed/)
 })
 
-test('default <name> -g → appears in `skill defaults`', () => {
+test('default <name> -g → appears in `skill active`', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   putStoreSkill(h, 'alpha', { description: 'an alpha skill' })
   assert.equal(run(h, ['default', 'alpha', '-g']).code, 0)
-  const d = run(h, ['defaults'])
+  const d = run(h, ['active'])
   assert.match(strip(d.out), /alpha/)
   assert.match(strip(d.out), /an alpha skill/)
 })
@@ -34,21 +42,19 @@ test('default <name> (no -g) → global default (config.yaml, not skill.config)'
   const h = mkHome(); run(h, ['init', '-g'])
   putStoreSkill(h, 'beta')
   assert.equal(run(h, ['default', 'beta']).code, 0)
-  assert.match(strip(run(h, ['defaults']).out), /beta/)
+  assert.match(strip(run(h, ['active']).out), /beta/)
   // defaults are GLOBAL: no skill.config is created, the entry lives in config.yaml
   assert.ok(!fs.existsSync(path.join(h, 'skill.config')))
   assert.match(fs.readFileSync(path.join(h, '.skill-cli', 'config.yaml'), 'utf8'), /- beta/)
 })
 
-test('undefault <name> -g → removed from defaults', () => {
+test('undefault <name> -g → removed from the active set', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   putStoreSkill(h, 'alpha')
   run(h, ['default', 'alpha', '-g'])
   run(h, ['undefault', 'alpha', '-g'])
-  const out = strip(run(h, ['defaults']).out)
-  const alphaRow = out.split('\n').find(l => /alpha/.test(l))
-  assert.ok(alphaRow)                       // catalog still lists the skill
-  assert.doesNotMatch(alphaRow, /★/)       // but it's no longer a default
+  // no default + no project allow → alpha is inactive → not listed
+  assert.match(strip(run(h, ['active']).out), /No active skills/)
 })
 
 test('undefault when not a default → graceful no-op', () => {
@@ -75,7 +81,7 @@ test('list shows ★ for a default skill', () => {
 test('AGENTS.md block documents start gate + discovery + context-altering rules', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   const md = fs.readFileSync(path.join(h, '.claude', 'CLAUDE.md'), 'utf8')
-  assert.match(md, /skill defaults/)
+  assert.match(md, /skill active/)
   assert.match(md, /skill default <name>/)
   assert.match(md, /START GATE/)
   assert.match(md, /BEFORE ANYTHING ELSE/)
@@ -86,22 +92,20 @@ test('AGENTS.md block documents start gate + discovery + context-altering rules'
   assert.match(md, /Discovery/)
 })
 
-test('skill defaults lists ALL skills with full descriptions (catalog, no body)', () => {
+test('skill active lists ONLY active skills with full descriptions', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   putStoreSkill(h, 'alpha', { description: 'A very long alpha description exceeding the sixty-six char truncation that must appear in FULL.' })
   putStoreSkill(h, 'beta', { description: 'beta desc' })
-  run(h, ['default', 'alpha', '-g'])   // alpha is a default (★); beta is not
-  const out = strip(run(h, ['defaults']).out)
-  // BOTH skills appear (catalog = all), and the long description is NOT truncated
+  run(h, ['default', 'alpha', '-g'])   // alpha active (default); beta inactive
+  let out = strip(run(h, ['active']).out)
+  assert.match(out, /alpha/)
+  assert.match(out, /exceeding the sixty-six char truncation that must appear in FULL/)  // full desc
+  assert.doesNotMatch(out, /beta/)     // inactive → not listed
+  // a project allow makes beta active → now it is listed too
+  fs.writeFileSync(path.join(h, 'skill.config'), 'allow:\n  - beta\n')
+  out = strip(run(h, ['active']).out)
   assert.match(out, /alpha/)
   assert.match(out, /beta/)
-  assert.match(out, /exceeding the sixty-six char truncation that must appear in FULL/)
-  // alpha is starred (default), beta is not
-  const alphaRow = out.split('\n').find(l => /alpha/.test(l))
-  const betaRow = out.split('\n').find(l => /beta/.test(l))
-  assert.match(alphaRow, /★/)
-  assert.doesNotMatch(betaRow, /★/)
   // no group-split headers — the agent decides, not the tool
   assert.doesNotMatch(out, /Auto-load/)
-  assert.doesNotMatch(out, /Context-altering/)
 })

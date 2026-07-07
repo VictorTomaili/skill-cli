@@ -1,40 +1,46 @@
 import c from 'picocolors'
 import { listStore } from '../lib/store.js'
-import { readGlobalConfig, writeGlobalConfig } from '../lib/config.js'
+import { readGlobalConfig, writeGlobalConfig, readProjectConfig, computeEffective } from '../lib/config.js'
 
-// `skill defaults` — list the skills marked as defaults. In the unified model a
-// default skill is BOTH active-by-default in every project AND auto-loaded on
-// agent session start (one global `defaults` list). This is the agent-facing
-// command the AGENTS.md block tells the agent to run, then `skill cat <name>`
-// for each. Defaults are a GLOBAL concept (never per-folder).
-export function cmdDefaults() {
+// `skill active` (aliases: `status`, legacy `defaults`) — the description-only
+// catalog of ACTIVE skills in the current project (defaults + project allow,
+// minus deny). The agent runs this at session start: it lists each active skill's
+// name + FULL description (never the body), then the agent itself decides per
+// skill — functional → `skill cat`, context-altering → propose. Detection of
+// context-altering is the agent's judgment from the description (no flag, no fixed
+// list), so it works for any skill, including ones installed later.
+export function cmdActive() {
   const installed = listStore()
   const globalCfg = readGlobalConfig()
+  const projCfg = readProjectConfig()
+  const eff = computeEffective(installed, globalCfg, projCfg)
   const defs = new Set((globalCfg.defaults || []).map(d => String(d).toLowerCase()))
 
-  console.log(c.bold('skill defaults') + c.gray(' — skill catalog (descriptions only; the agent decides: functional → `skill cat`, context-altering → propose)'))
+  console.log(c.bold('skill active') + c.gray(' — active skills in this project (descriptions only; functional → `skill cat`, context-altering → propose)'))
   console.log()
 
-  if (installed.length === 0) {
-    console.log(c.gray('  No skills installed. Install with: ') + c.cyan('skill install <source>'))
+  if (eff.length === 0) {
+    console.log(c.gray('  No active skills in this project.'))
     return
   }
 
-  // CATALOG, not a loader: print every installed skill's name + FULL description
-  // (collapsed to one line) + triggers. Never dump the skill body here — the
-  // agent reads descriptions, then itself decides per skill: load (skill cat) if
-  // it's functional for the task, or PROPOSE if it's context-altering (changes
-  // HOW the agent responds). Detection is the agent's judgment from the
-  // description, so it works for any skill — including ones loaded later — with
-  // no hardcoded list or flag.
-  for (const s of installed) {
+  // CATALOG of ACTIVE skills only (not all installed): defaults + project allow,
+  // minus deny. Print each one's name + FULL description (one line) + triggers —
+  // never the body. The agent reads descriptions and itself decides per skill:
+  // load (skill cat) if functional for the task, or PROPOSE if context-altering
+  // (changes HOW the agent responds). Detection is the agent's judgment from the
+  // description, so it works for any skill — including ones installed later —
+  // with no hardcoded list or flag.
+  for (const name of eff) {
+    const s = installed.find(x => x.name === name)
+    if (!s) continue
     const star = defs.has(s.name.toLowerCase()) ? c.yellow('★') + ' ' : '  '
     const trg = s.triggers.length ? '  ' + c.gray('/' + s.triggers.join(', /')) : ''
     console.log(`  ${star}${c.bold(s.name)}${trg}`)
     if (s.description) console.log(c.gray('      ' + String(s.description).replace(/[\r\n]+/g, ' ').trim()))
   }
   console.log()
-  console.log(c.yellow('★') + c.gray(' = default (active by default). Load a skill: ') + c.cyan('skill cat <name>'))
+  console.log(c.yellow('★') + c.gray(' = default. Load a skill: ') + c.cyan('skill cat <name>'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every

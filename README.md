@@ -83,7 +83,7 @@ short bootstrap block telling it to run `skill` on `/X`.
 | `skill disable <name> [-g]` | Deny in project, or remove global default with `-g` |
 | `skill default <name>` | Mark a default skill (global: active + auto-load) |
 | `skill undefault <name>` | Remove the default flag |
-| `skill defaults` | List default skills (the command your agent runs on start) |
+| `skill active` | List ACTIVE skills + descriptions (the command your agent runs on start; alias: `status`) |
 | `skill list` | Show installed + active skills (cwd-aware, ★ = default) |
 | `skill show <name>` | Skill metadata (path, triggers, version) |
 | `skill cat <name>` | Dump skill content into context |
@@ -181,8 +181,8 @@ with no source also opens it.
 A **default** is a skill that is **active by default in every project** AND
 **auto-loaded on agent session start** — one unified global list in `config.yaml`
 (`defaults:`). Mark one with `skill default <name>`, remove with
-`skill undefault <name>`, list them with `skill defaults`. The AGENTS.md bootstrap
-block tells your agent to run `skill defaults` on start, then `skill cat <name>`
+`skill undefault <name>`, list them with `skill active`. The AGENTS.md bootstrap
+block tells your agent to run `skill active` on start, then `skill cat <name>`
 for each.
 
 Defaults are a **global** concept (never per-project). A project can still turn a
@@ -197,7 +197,7 @@ default; `space` toggles the per-project override.
 instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 
 > **START GATE:** on the first user message, your VERY FIRST action — BEFORE
-> ANYTHING ELSE (before thinking, before any tool call) — is `skill defaults`, the
+> ANYTHING ELSE (before thinking, before any tool call) — is `skill active`, the
 > skill **catalog** (every skill's name + full description; never the body). Read
 > it and decide per skill from its description: **functional** for the task → load
 > it (`skill cat <name>`); **context-altering** (changes HOW you respond —
