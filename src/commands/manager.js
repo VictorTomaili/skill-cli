@@ -73,6 +73,12 @@ function viewBody(s) {
   return shown.join('\n')
 }
 
+// Clamp a cursor move so it can't leave the list bounds (pure → unit-tested).
+export function moveCursor(cur, length, delta) {
+  if (length <= 0) return 0
+  return Math.max(0, Math.min(length - 1, cur + delta))
+}
+
 // One custom prompt owns the whole keyboard loop (select/checkbox can't do `d`/view).
 //   ↑↓ move · space toggle active in this project · d delete (confirm) ·
 //   enter view the SKILL.md · q quit. Re-reads the store/config every render so
@@ -80,7 +86,7 @@ function viewBody(s) {
 const managerPrompt = createPrompt((_config, done) => {
   const [cursor, setCursor] = useState(0)
   const [mode, setMode] = useState('list')      // 'list' | 'confirm' | 'view'
-  const [, bump] = useState(0)                  // force a re-render after a side-effect
+  const [tick, setTick] = useState(0)           // bump (a VALUE, not a fn) to force a re-render
   const [status, setStatus] = useState('')
   const prefix = usePrefix({ theme: { prefix: { idle: c.cyan('?'), done: c.cyan('✓') } } })
 
@@ -96,16 +102,19 @@ const managerPrompt = createPrompt((_config, done) => {
     if (mode === 'confirm') {
       if (key.name === 'y') {
         if (s) { removeOne(s.name); setStatus(c.red('✓ removed ') + s.name) }
-        setMode('list'); bump(n => n + 1)
+        setMode('list'); setTick(tick + 1)
       } else if (key.name === 'escape' || key.name === 'n' || (key.ctrl && key.name === 'c')) {
         setMode('list'); setStatus(c.gray('cancelled'))
       }
       return
     }
     // list mode
-    if (isUpKey(key)) { setCursor(i => Math.max(0, i - 1)); setStatus('') }
-    else if (isDownKey(key)) { setCursor(i => Math.min(Math.max(0, installed.length - 1), i + 1)); setStatus('') }
-    else if (key.name === 'space') { if (s) { setStatus(toggleActive(s.name)); bump(n => n + 1) } }
+    // NB: @inquirer/core's useState setter takes a VALUE (there is NO functional
+    // updater like React's). We read the clamped `cur` from THIS render's closure —
+    // useKeypress keeps the handler fresh on every render, so it's always current.
+    if (isUpKey(key)) { setCursor(moveCursor(cur, installed.length, -1)); setStatus('') }
+    else if (isDownKey(key)) { setCursor(moveCursor(cur, installed.length, 1)); setStatus('') }
+    else if (key.name === 'space') { if (s) { setStatus(toggleActive(s.name)); setTick(tick + 1) } }
     else if (key.name === 'd') { if (s) { setMode('confirm'); setStatus('') } }
     else if (isEnterKey(key)) { if (s) { setMode('view'); setStatus('') } }
     else if (key.name === 'q' || (key.ctrl && key.name === 'c')) done()

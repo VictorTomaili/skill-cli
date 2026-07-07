@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { computeToggle } from '../../src/commands/manager.js'
+import { computeToggle, moveCursor } from '../../src/commands/manager.js'
 
 // computeToggle is a PURE decision (no I/O), so it's unit-testable in-process
 // without SKILL_CLI_HOME or a store on disk — we pass fake configs directly.
@@ -40,4 +40,25 @@ test('computeToggle: is case-insensitive', () => {
   // stored canonical 'alpha'; configs might hold 'Alpha'
   const r = computeToggle(installed, gGlobal, { allow: [], deny: ['Alpha'] }, 'alpha')
   assert.deepEqual(r.deny, [])           // recognized + cleared despite case diff
+})
+
+// moveCursor clamps the keyboard cursor — also guards the @inquirer/core pitfall
+// that its useState setter takes a VALUE (we compute the next index, not a fn).
+test('moveCursor: down advances, clamps at the last row', () => {
+  assert.equal(moveCursor(0, 5, 1), 1)
+  assert.equal(moveCursor(4, 5, 1), 4)   // index 4 is the last of 5
+})
+
+test('moveCursor: up retreats, clamps at 0', () => {
+  assert.equal(moveCursor(3, 5, -1), 2)
+  assert.equal(moveCursor(0, 5, -1), 0)
+})
+
+test('moveCursor: empty list → 0 (no crash)', () => {
+  assert.equal(moveCursor(2, 0, 1), 0)
+  assert.equal(moveCursor(0, 0, -1), 0)
+})
+
+test('moveCursor: clamps an out-of-range cursor (after a delete shrinks the list)', () => {
+  assert.equal(moveCursor(7, 3, 0), 2)   // cursor was 7, list is now 3 → last index 2
 })
