@@ -60,10 +60,16 @@ export function cmdRemove(args) {
   const installed = listStore()
   const byLower = new Map(installed.map(s => [s.name.toLowerCase(), s.name]))
   const targets = []
+  const seen = new Set()
   for (const a of requested) {
     const canon = byLower.get(a.toLowerCase())
-    if (canon) targets.push(canon)
-    else console.log(c.yellow('  · ' + pad(a)) + c.yellow('not installed — skipping'))
+    if (!canon) { console.log(c.yellow('  · ' + pad(a)) + c.yellow('not installed — skipping')); continue }
+    // dedupe exact + case-variant duplicates (foo, FOO, foo → a single removal,
+    // not three, so the count and prompt list stay accurate)
+    const key = canon.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    targets.push(canon)
   }
 
   if (targets.length === 0) {

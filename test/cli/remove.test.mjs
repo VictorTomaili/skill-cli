@@ -135,3 +135,37 @@ test('remove: aliases rm and uninstall dispatch correctly', () => {
   run(h, ['uninstall', 'bar'])
   assert.equal(fs.existsSync(storeDir(h, 'bar')), false)
 })
+
+test('remove: cleans current project allow-list (skill.config)', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'foo', {}, '# Foo')
+  run(h, ['init'])                  // create skill.config in cwd (home)
+  run(h, ['enable', 'foo'])         // project-level allow: [foo]
+  const pcfg = path.join(h, 'skill.config')
+  assert.match(fs.readFileSync(pcfg, 'utf8'), /foo/)
+  run(h, ['remove', 'foo'])
+  assert.equal(fs.existsSync(storeDir(h, 'foo')), false)
+  assert.doesNotMatch(fs.readFileSync(pcfg, 'utf8'), /foo/)   // project allow cleaned
+})
+
+test('remove: --yes and --force long forms skip the prompt', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'a', {}, '# A')
+  putStoreSkill(h, 'b', {}, '# B')
+  run(h, ['remove', 'a', '--yes'], { SKILL_CLI_FORCE_TTY: '1' })
+  assert.equal(fs.existsSync(storeDir(h, 'a')), false)
+  run(h, ['remove', 'b', '--force'], { SKILL_CLI_FORCE_TTY: '1' })
+  assert.equal(fs.existsSync(storeDir(h, 'b')), false)
+})
+
+test('remove: duplicate / case-variant names removed once (no miscount)', () => {
+  const h = mkHome()
+  run(h, ['init', '-g'])
+  putStoreSkill(h, 'foo', {}, '# Foo')
+  const r = run(h, ['remove', 'foo', 'FOO', 'foo'])   // 3 args → 1 canonical
+  assert.equal(r.code, 0)
+  assert.match(strip(r.out), /1 skill\(s\) removed/)   // not 3
+  assert.equal(fs.existsSync(storeDir(h, 'foo')), false)
+})
