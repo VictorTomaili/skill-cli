@@ -7,15 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
+- Per-agent hook adapters for automatic `/X` triggering (push model).
+
+## [0.5.0] - 2026-07-07
+
 ### Added
 - AGENTS.md bootstrap block now instructs the agent to (a) **discover & load relevant skills per message** (skills are not in context until loaded — match the message to a skill's triggers/topic, then `skill cat`), and (b) **propose — don't auto-apply — context-altering skills** (those that change HOW the agent responds, e.g. an output-style/mode skill): apply only after the user confirms (an explicit `/X` counts as confirmation).
 
 ### Changed
 - Manager + `skill list`: clearer activation UI. New **`source`** column shows *why* a skill is/isn't active in the current project — `global` (inherited default), `global·off` (default but denied here), `project` (project allow only), `—` (passive). The label is derived from `active` + `isDefault`, so it can never disagree with the ●/○ marker. The manager now also prints the project path + counts (`installed · active here · global defaults`) and an explicit legend; the `space` (per-project) vs `a` (global default) keys are labelled distinctly.
 
-### Planned
-- Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
-- Per-agent hook adapters for automatic `/X` triggering (push model).
+### Fixed
+- `source` label: a global-default skill that is **also** explicitly enabled in the current project now shows `project` (the more-specific source), with ★ still marking its default membership. Previously `isDefault && active` short-circuited to `global`.
 
 ## [0.4.0] - 2026-07-07
 

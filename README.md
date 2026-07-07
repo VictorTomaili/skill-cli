@@ -197,8 +197,12 @@ default; `space` toggles the per-project override.
 instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 
 > On session start, run `skill defaults` and load each with `skill cat <name>`.
-> When the user types `/X`, run `skill trigger X`. Single match → apply the output;
-> multiple → show candidates; load each skill only once per session.
+> Skills are NOT in context until you load them — each message, decide whether one
+> is relevant and load it (`skill cat <name>` / `skill trigger <keyword>`); load each
+> only once. A skill that changes HOW you respond (output style/mode) is PROPOSED,
+> not auto-applied — apply only after the user confirms (an explicit `/X` counts).
+> When the user types `/X`, run `skill trigger X` — single match → apply; multiple →
+> show candidates.
 
 It's wrapped in `<!-- BEGIN skill-cli --> … <!-- END skill-cli -->` markers, never
 duplicates, and preserves your existing file content. Re-run `init -g` any time —
