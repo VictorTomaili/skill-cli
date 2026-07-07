@@ -21,13 +21,23 @@ test('init -g: idempotent — AGENTS block not duplicated', () => {
   assert.equal((content.match(/BEGIN skill-cli/g) || []).length, 1)
 })
 
-test('init -g: injects into codex + gemini when their dirs exist', () => {
+test('init -g: injects into codex + gemini + pi when their dirs exist', () => {
   const h = mkHome()
   fs.mkdirSync(path.join(h, '.codex'), { recursive: true })
   fs.mkdirSync(path.join(h, '.gemini'), { recursive: true })
+  fs.mkdirSync(path.join(h, '.pi', 'agent'), { recursive: true })
   run(h, ['init', '-g'])
   assert.match(fs.readFileSync(path.join(h, '.codex', 'AGENTS.md'), 'utf8'), /skill-cli/)
   assert.match(fs.readFileSync(path.join(h, '.gemini', 'GEMINI.md'), 'utf8'), /skill-cli/)
+  assert.match(fs.readFileSync(path.join(h, '.pi', 'agent', 'AGENTS.md'), 'utf8'), /skill-cli/)
+})
+
+test('init -g: pi uses the nested ~/.pi/agent dir (skipped if only ~/.pi exists)', () => {
+  const h = mkHome()
+  fs.mkdirSync(path.join(h, '.pi'), { recursive: true }) // no agent/ subdir yet
+  const r = run(h, ['init', '-g'])
+  assert.equal(r.code, 0)
+  assert.ok(!fs.existsSync(path.join(h, '.pi', 'agent', 'AGENTS.md')))
 })
 
 test('init -g: skips agents whose dir does not exist', () => {

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `skill init -g` now bootstraps **pi** too — the AGENTS.md block is injected into `~/.pi/agent/AGENTS.md` (pi's global context file). Claude Code, Codex, Gemini, and pi are now all bootstrapped on a single re-run.
+
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).

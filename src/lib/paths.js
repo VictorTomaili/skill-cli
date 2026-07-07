@@ -17,4 +17,6 @@ export const AGENT_GLOBALS = [
   { id: 'claude', dir: '.claude', file: 'CLAUDE.md' },
   { id: 'codex', dir: '.codex', file: 'AGENTS.md' },
   { id: 'gemini', dir: '.gemini', file: 'GEMINI.md' },
+  // pi loads global context from ~/.pi/agent/AGENTS.md (or CLAUDE.md).
+  { id: 'pi', dir: '.pi/agent', file: 'AGENTS.md' },
 ]

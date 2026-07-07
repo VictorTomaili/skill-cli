@@ -64,6 +64,7 @@ That's it. Your agent now knows: *when the user types `/X`, run `skill trigger X
 ~/.claude/CLAUDE.md          ← bootstrap block injected by `skill init -g`
 ~/.codex/AGENTS.md             (idempotent — preserves your existing content)
 ~/.gemini/GEMINI.md
+~/.pi/agent/AGENTS.md
 ```
 
 Agents don't read `skill.config` directly — the CLI does. The agent only needs the
@@ -195,7 +196,7 @@ It's wrapped in `<!-- BEGIN skill-cli --> … <!-- END skill-cli -->` markers, n
 duplicates, and preserves your existing file content. Re-run `init -g` any time —
 it reports `already set up` and rewrites nothing.
 
-**Supported agents:** Claude Code, Codex, Gemini. (Cursor uses `.cursor/rules` with
+**Supported agents:** Claude Code, Codex, Gemini, and pi. (Cursor uses `.cursor/rules` with
 a different format — adapter planned. See [issue tracker](https://github.com/victortomaili/skill-cli/issues).)
 
 ## Cross-platform
