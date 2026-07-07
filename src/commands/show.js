@@ -8,7 +8,7 @@ export function cmdShow(args) {
   const s = readSkill(name)
   if (!s) { console.error(c.red('Skill not found: ' + name)); process.exit(1) }
 
-  console.log(c.bold(s.name) + c.gray('  v' + (s.data.version || '?')))
+  console.log(c.bold(s.name) + c.gray('  v' + (s.data.version || '-')))
   if (s.data.description) console.log(c.gray(s.data.description))
   console.log()
   console.log(c.gray('path:     ') + s.path)

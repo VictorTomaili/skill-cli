@@ -13,10 +13,26 @@ import { pad } from '../lib/format.js'
 //   skill update <name>...    update specific skills
 //   skill update --all        same as no args (explicit)
 export function cmdUpdate(args) {
+  const installed = listStore()
+  const byLower = new Map(installed.map(s => [s.name.toLowerCase(), s.name]))
   const explicit = args.filter(a => !a.startsWith('-'))
-  const targets = explicit.length ? explicit : listStore().map(s => s.name)
 
-  if (targets.length === 0) {
+  let targets = []
+  let unknown = 0
+  if (explicit.length) {
+    // B1: case-fold to the canonical installed name (every other command does).
+    // A side benefit: an unknown name like `../x` can't reach path.join(STORE_DIR,
+    // name), closing the latent traversal surface in `skill update <name>`.
+    for (const a of explicit) {
+      const canon = byLower.get(a.toLowerCase())
+      if (canon) targets.push(canon)
+      else { console.log(c.red('  ✗ ' + pad(a)) + c.red('not installed')); unknown++ }
+    }
+  } else {
+    targets = installed.map(s => s.name)
+  }
+
+  if (targets.length === 0 && unknown === 0) {
     console.log(c.yellow('Store empty. Nothing to update.'))
     return
   }
@@ -25,6 +41,7 @@ export function cmdUpdate(args) {
   console.log()
 
   const counts = { updated: 0, current: 0, failed: 0, nosource: 0 }
+  counts.failed += unknown
   for (const name of targets) counts[updateOne(name)]++
 
   console.log()

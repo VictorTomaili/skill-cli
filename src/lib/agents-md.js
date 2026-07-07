@@ -39,13 +39,20 @@ export function injectToAgentGlobal(agent) {
   const file = path.join(dir, agent.file)
   let content = ''
   try { content = fs.readFileSync(file, 'utf8') } catch {}
-  fs.writeFileSync(file, injectBlock(content), 'utf8')
-  return file
+  const next = injectBlock(content)
+  // B4: only rewrite + claim "updated" when the block actually changed. On an
+  // idempotent re-run (block already present & identical) report "current" and
+  // leave the file untouched (preserves mtime, avoids needless rewrites).
+  const status = content.includes(BEGIN) ? (next === content ? 'current' : 'updated') : 'updated'
+  if (next !== content) fs.writeFileSync(file, next, 'utf8')
+  return { file, status }
 }
 
 export function injectToAllAgents() {
   return AGENT_GLOBALS.map(agent => {
-    const file = injectToAgentGlobal(agent)
-    return { agent: agent.id, file, status: file ? 'updated' : 'agent-not-found' }
+    const r = injectToAgentGlobal(agent)
+    return r
+      ? { agent: agent.id, file: r.file, status: r.status }
+      : { agent: agent.id, file: null, status: 'agent-not-found' }
   })
 }

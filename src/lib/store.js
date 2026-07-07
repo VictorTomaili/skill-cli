@@ -31,8 +31,22 @@ export function listStore() {
 
 // A skill name is a plain identifier (alnum/._-, starting alnum). Rejecting path
 // separators and ".." closes a path-traversal surface: `skill cat ../../x` can't
-// escape STORE_DIR via the dir-name path.
-const SAFE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
+// escape STORE_DIR via the dir-name path. Exported so install/update can reuse it
+// on the WRITE path — the dangerous one: a malicious frontmatter `name: ../x`
+// could otherwise rmSync/cpSync outside STORE_DIR.
+export const SAFE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
+
+// Returns a safe skill name (alnum/._- only, no "..", resolving strictly inside
+// STORE_DIR) or null if `name` could escape the store. Call before joining any
+// untrusted name (frontmatter `name`, fetched dir name) onto STORE_DIR.
+export function sanitizeSkillName(name) {
+  const n = String(name ?? '').trim()
+  if (!SAFE_NAME.test(n) || n.includes('..')) return null
+  const root = path.resolve(STORE_DIR)
+  const dest = path.resolve(STORE_DIR, n)
+  if (dest !== root && !dest.startsWith(root + path.sep)) return null
+  return n
+}
 
 export function readSkill(nameOrDir) {
   const n = String(nameOrDir)

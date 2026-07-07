@@ -7,7 +7,6 @@ const DEFAULT_GLOBAL = {
   version: 1,
   store: STORE_DIR,
   enabled_global: [],
-  default_agents: ['claude', 'codex'],
 }
 
 export function readGlobalConfig() {
@@ -23,7 +22,15 @@ export function readGlobalConfig() {
 
 export function writeGlobalConfig(cfg) {
   fs.mkdirSync(CLI_ROOT, { recursive: true })
-  fs.writeFileSync(GLOBAL_CONFIG, yaml.stringify(cfg), 'utf8')
+  // B2: write only the known schema, not arbitrary pass-through keys. readGlobalConfig
+  // merges parsed-over-defaults, which would otherwise round-trip dead keys (e.g.
+  // the removed `default_agents`) back into the file forever.
+  const out = {
+    version: cfg.version ?? 1,
+    store: cfg.store ?? STORE_DIR,
+    enabled_global: cfg.enabled_global || [],
+  }
+  fs.writeFileSync(GLOBAL_CONFIG, yaml.stringify(out), 'utf8')
 }
 
 export function projectConfigPath(cwd = process.cwd()) {
@@ -44,7 +51,13 @@ export function readProjectConfig(cwd = process.cwd()) {
 }
 
 export function writeProjectConfig(cwd, cfg) {
-  fs.writeFileSync(projectConfigPath(cwd), yaml.stringify(cfg), 'utf8')
+  // B2: normalize to the known schema on write (drops stale/junk keys).
+  const out = {
+    inherit: cfg.inherit !== false,
+    deny: cfg.deny || [],
+    allow: cfg.allow || [],
+  }
+  fs.writeFileSync(projectConfigPath(cwd), yaml.stringify(out), 'utf8')
 }
 
 // Simple glob: * → any chars, ? → single char. Pattern length is capped to guard

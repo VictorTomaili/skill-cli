@@ -42,6 +42,13 @@ export function fetchSkillsToTemp(source) {
   const safe = String(source ?? '').trim()
   if (!safe) throw new Error('empty source')
   if (/[\r\n]/.test(safe)) throw new Error('source must be a single line')
+  // B5: defense-in-depth on Windows. The source reaches `cmd.exe /c npx … <source>`;
+  // cmd.exe parses shell metacharacters even though we spawn with shell:false
+  // (cmd.exe IS a shell). Real sources (owner/repo, URL, git URL, npm name, local
+  // path) never contain these, so reject loudly rather than risk cmd interpreting.
+  if (process.platform === 'win32' && /[&|<>^]/.test(safe)) {
+    throw new Error('source contains Windows shell metacharacters (& | < > ^) — use a path/URL without them')
+  }
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-cli-'))
   const { cmd, args } = buildNpxSpawn(safe)

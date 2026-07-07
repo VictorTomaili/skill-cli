@@ -22,6 +22,7 @@ function initGlobal() {
   console.log(c.bold('AGENTS.md injection (idempotent):'))
   for (const r of injectToAllAgents()) {
     if (r.status === 'updated') console.log(c.green('  ✓ ') + r.agent + c.gray(' → ' + r.file))
+    else if (r.status === 'current') console.log(c.gray('  · ') + r.agent + c.gray(' (already set up)'))
     else console.log(c.gray('  · ') + r.agent + c.gray(' (not found, skipped)'))
   }
   console.log()

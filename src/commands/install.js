@@ -4,6 +4,7 @@ import c from 'picocolors'
 import { STORE_DIR } from '../lib/paths.js'
 import { parseSkillMd } from '../lib/frontmatter.js'
 import { fetchSkillsToTemp } from '../lib/npx.js'
+import { sanitizeSkillName } from '../lib/store.js'
 
 // Local paths are resolved to absolute BEFORE switching to the temp cwd, so
 // npx skills looks them up relative to the user's cwd, not the temp dir.
@@ -40,17 +41,24 @@ export function cmdInstall(args) {
   try {
     fs.mkdirSync(STORE_DIR, { recursive: true })
     const moved = []
+    const skipped = []
     for (const entry of fs.readdirSync(fetchedDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue
       const srcSkillDir = path.join(fetchedDir, entry.name)
       const mdPath = path.join(srcSkillDir, 'SKILL.md')
-      let name = entry.name
+      let raw = entry.name
       if (fs.existsSync(mdPath)) {
         try {
           const { data } = parseSkillMd(fs.readFileSync(mdPath, 'utf8'))
-          if (data.name) name = data.name
+          if (data.name) raw = data.name
         } catch { /* fall back to dir name */ }
       }
+      // S1 (path traversal): the dest name is untrusted — it comes from the
+      // fetched SKILL.md frontmatter or source dir name. `name: ../x` could
+      // otherwise write (and the preceding rmSync could delete) outside STORE_DIR.
+      // Prefer the frontmatter name when safe; else the dir name; else skip.
+      const name = sanitizeSkillName(raw) || sanitizeSkillName(entry.name)
+      if (!name) { skipped.push(entry.name); continue }
       const dest = path.join(STORE_DIR, name)
       const reinstalled = fs.existsSync(dest)
       fs.rmSync(dest, { recursive: true, force: true })
@@ -60,6 +68,7 @@ export function cmdInstall(args) {
       fs.writeFileSync(path.join(dest, '.source'), resolved + '\n')
       moved.push({ name, reinstalled })
     }
+    for (const s of skipped) console.log(c.yellow('  ⚠ skipped ') + c.bold(s) + c.gray(' (not a safe skill name)'))
 
     if (moved.length === 0) {
       // throw (not process.exit) so the finally cleans up the temp dir

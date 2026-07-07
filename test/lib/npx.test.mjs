@@ -13,6 +13,21 @@ test('empty source throws', () => {
   assert.throws(() => fetchSkillsToTemp(null), /empty source/)
 })
 
+// B5: on Windows the source reaches `cmd.exe /c npx ... <source>`, and cmd.exe
+// parses shell metacharacters even though we spawn with shell:false. Real sources
+// never contain these; the guard throws before any spawn. Skipped off-win32.
+test('fetchSkillsToTemp: win32 rejects shell metacharacters in source (B5)',
+  { skip: process.platform !== 'win32' }, () => {
+    const prev = process.env.SKILL_CLI_FETCH_FIXTURE
+    delete process.env.SKILL_CLI_FETCH_FIXTURE
+    try {
+      assert.throws(() => fetchSkillsToTemp('evil&cmd'), /shell metacharacters/i)
+      assert.throws(() => fetchSkillsToTemp('a|b'), /shell metacharacters/i)
+    } finally {
+      if (prev !== undefined) process.env.SKILL_CLI_FETCH_FIXTURE = prev
+    }
+  })
+
 test('multiline source throws', () => {
   assert.throws(() => fetchSkillsToTemp('a\nb'), /single line/)
   assert.throws(() => fetchSkillsToTemp('a\rb'), /single line/)
