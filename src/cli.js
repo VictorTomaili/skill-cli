@@ -36,6 +36,10 @@ ${c.bold('Maintenance')}
 
 ${c.gray('Source formats (install): owner/repo | github/gitlab URL | git URL | local path | npm package')}
 ${c.gray('Test (no real ~ touched): SKILL_CLI_HOME=/tmp/sktest skill init -g')}
+
+${c.bold('★ Enjoying skill-cli?')} ${c.gray('Star the repo — it helps others find it.')}
+  ${c.cyan('gh repo star victortomaili/skill-cli')}
+  ${c.gray('or: https://github.com/victortomaili/skill-cli')}
 `
 
 const [, , cmd, ...rest] = process.argv

@@ -1,24 +1,53 @@
 {
   "name": "skill-cli",
   "version": "0.1.0",
-  "description": "Cross-agent skill manager: single global store + activation via skill.config + bootstrap via AGENTS.md",
+  "description": "Cross-agent skill manager — one global store, clean agent folders, activation via skill.config",
   "license": "MIT",
+  "author": "Victor Tomaili <victor@tomaili.com>",
+  "homepage": "https://github.com/victortomaili/skill-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victortomaili/skill-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/victortomaili/skill-cli/issues"
+  },
   "type": "module",
   "bin": {
     "skill": "./src/cli.js"
   },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "scripts": {
     "test": "node --test",
-    "test:lib": "node --test test/lib",
-    "test:cli": "node --test test/cli",
     "test:e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {
     "picocolors": "^1.1.1",
     "yaml": "^2.6.0"
   },
-  "keywords": ["cli", "skills", "agent", "ai", "claude", "codex", "cursor"]
+  "keywords": [
+    "cli",
+    "skills",
+    "skill",
+    "agent",
+    "ai",
+    "ai-agent",
+    "llm",
+    "claude",
+    "claude-code",
+    "codex",
+    "cursor",
+    "gemini",
+    "prompt-engineering",
+    "developer-tools",
+    "workflow"
+  ]
 }

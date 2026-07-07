@@ -1,4 +1,26 @@
+# dependencies
 node_modules/
+
+# logs
 *.log
+npm-debug.log*
+
+# OS
 .DS_Store
+Thumbs.db
+
+# env / secrets
+.env
+.env.*
+
+# editor / IDE
+.idea/
+*.swp
+*.swo
+
+# coverage / build artifacts
+coverage/
+*.lcov
+
+# skill-cli local testing artifacts
 skills-lock.json

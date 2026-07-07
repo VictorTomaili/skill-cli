@@ -1,0 +1,36 @@
+name: ✨ Feature request
+description: Suggest an idea or improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that skill-cli makes hard or impossible?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would ideal behavior look like?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - new command
+        - install / update
+        - activation / config
+        - agent support (Cursor, etc.)
+        - bootstrap / triggers
+        - documentation
+        - other
+    validations:
+      required: false

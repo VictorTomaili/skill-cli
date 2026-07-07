@@ -1,0 +1,59 @@
+name: 🐛 Bug report
+description: Report something that's broken or behaves unexpectedly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug! A minimal repro helps a lot.
+        For security issues, please use [SECURITY.md](../../SECURITY.md) instead of this form.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what actually happened?
+      placeholder: |
+        1. ran `skill install owner/repo`
+        2. expected the skill to appear in `skill list`
+        3. got an error: ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: skill-cli version
+      description: Output of `skill --version`
+      placeholder: skill-cli 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS and Node version
+      placeholder: "Windows 11 / Node v22.5.0"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output / logs
+      description: Paste the relevant command output (no secrets).
+      render: shell
+  - type: dropdown
+    id: command
+    attributes:
+      label: Affected command
+      options:
+        - init
+        - install
+        - update
+        - enable
+        - disable
+        - list
+        - show
+        - cat
+        - trigger
+        - other
+    validations:
+      required: false
