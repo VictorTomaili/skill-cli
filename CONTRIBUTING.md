@@ -19,7 +19,7 @@ git clone https://github.com/victortomaili/skill-cli
 cd skill-cli
 npm install
 npm link            # makes the `skill` command point at your checkout
-npm test            # 157 tests, network-free (~3s)
+npm test            # 225 tests, network-free (~3s)
 ```
 
 Requires Node.js 22+. Tests never touch your real home directory — they run against

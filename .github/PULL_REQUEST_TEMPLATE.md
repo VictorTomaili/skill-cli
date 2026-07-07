@@ -16,7 +16,7 @@
 
 ## Checklist
 
-- [ ] `npm test` passes locally (157+ tests, network-free)
+- [ ] `npm test` passes locally (225+ tests, network-free)
 - [ ] Tests added for new behavior / bug fixes (incl. error + edge cases)
 - [ ] No new runtime dependency without justification
 - [ ] [README](../README.md) updated for user-facing changes

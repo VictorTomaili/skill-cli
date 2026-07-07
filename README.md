@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/@victortomaili/skill-cli.svg)](https://www.npmjs.com/package/@victortomaili/skill-cli)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-green.svg)](https://nodejs.org)
-[![tests](https://img.shields.io/badge/tests-157%20passing-brightgreen.svg)](#development)
+[![tests](https://img.shields.io/badge/tests-225%20passing-brightgreen.svg)](#development)
 
 **skill-cli** is a cross-agent skill manager for AI coding agents (Claude Code,
 Codex, Cursor, Gemini, …). Skills live in a single global store — your agent
@@ -18,8 +18,10 @@ config file.
 - 🎛️ **Three-layer activation** — installed → enabled globally → enabled per project. `allow` always wins over `deny`.
 - 🔌 **Universal sources** — `owner/repo`, GitHub/GitLab URL, git URL, local path, npm package (via `npx skills`).
 - ⚡ **Pull-based** — agents pull skill content into context on demand via `skill trigger /X`. No hooks required.
+- 🔍 **Interactive TUIs** — `skill search` to discover & multi-install from the skills registry; `skill` (no args) to manage every installed skill with the keyboard. TTY-only; agents & CI stay non-interactive.
+- ⭐ **Default skills** — mark skills to auto-load on every agent session start.
 - 🖥️ **Cross-platform** — Windows, macOS, Linux (handles the Windows `npx` spawn quirk for you).
-- 🧪 **Well tested** — 157 unit + CLI tests, network-free by default.
+- 🧪 **Well tested** — 225 unit + CLI tests, network-free by default.
 
 ## ⭐ Found this useful?
 
@@ -40,10 +42,11 @@ Requires Node.js 22+.
 # 1) one-time global setup (creates the store + bootstraps detected agents)
 skill init -g
 
-# 2) install a skill from any source
+# 2) install a skill from any source (or `skill search` to browse interactively)
 skill install owner/repo
 
-# 3) use it — type /<trigger> in your agent, or load directly
+# 3) manage everything with the keyboard (terminal only)
+skill              # ↑↓ move · space toggle · a default · d delete · enter view
 skill list
 skill cat <name>
 ```
@@ -55,9 +58,9 @@ That's it. Your agent now knows: *when the user types `/X`, run `skill trigger X
 ```
 ~/.skill-cli/
   store/<skill>/SKILL.md     ← one canonical store (skills live here)
-  config.yaml                ← global config (enabled_global)
+  config.yaml                ← global config (enabled_global, defaults_global)
 
-<project>/skill.config       ← per-project activation (inherit / deny / allow)
+<project>/skill.config       ← per-project activation + defaults (inherit / deny / allow / defaults)
 ~/.claude/CLAUDE.md          ← bootstrap block injected by `skill init -g`
 ~/.codex/AGENTS.md             (idempotent — preserves your existing content)
 ~/.gemini/GEMINI.md
@@ -73,16 +76,21 @@ short bootstrap block telling it to run `skill` on `/X`.
 | `skill init -g` | Global setup: create store + inject bootstrap into agent files |
 | `skill init` | Create a `skill.config` for the current project |
 | `skill install <source>` | Fetch skill(s) to the store (agent dirs untouched) |
+| `skill search` | Interactive search & multi-install from the skills registry (TTY) |
+| `skill` / `skill manager` | Interactive manager: toggle, default, delete, view (TTY) |
 | `skill enable <name> [-g]` | Enable in project, or globally with `-g` |
 | `skill disable <name> [-g]` | Disable |
-| `skill list` | Show installed + active skills (cwd-aware) |
+| `skill default <name> [-g]` | Mark a skill to auto-load on session start |
+| `skill undefault <name> [-g]` | Remove the auto-load flag |
+| `skill defaults` | List default skills (the command your agent runs on start) |
+| `skill list` | Show installed + active skills (cwd-aware, ★ = default) |
 | `skill show <name>` | Skill metadata (path, triggers, version) |
 | `skill cat <name>` | Dump skill content into context |
 | `skill trigger <keyword\|name>` | `/X` trigger or skill name → content (single), candidates (multi) |
 | `skill update [name…\|--all]` | Re-fetch from source, update changed skills |
 | `skill remove <name> [-y]` | Remove from store (prompts on TTY; agents / CI / `-y` skip) |
 
-Aliases: `ls` (list), `add` (install), `info` (show), `rm`/`uninstall` (remove).
+Aliases: `ls` (list), `add` (install), `info` (show), `rm`/`uninstall` (remove), `browse` (search), `ui` (manager), `def` (default), `undef` (undefault).
 
 ## Install sources
 
@@ -139,11 +147,47 @@ allow: [react-best-practices]  # then open them one by one
 > `allow` always wins over `deny`, so `deny: ["*"]` + `allow: [X]` = "only X".
 > Matching is case-insensitive throughout.
 
+## Interactive mode (terminal only)
+
+When run in a real terminal, skill-cli offers two keyboard UIs. **Agents and CI
+never enter them** (a non-TTY stdin is detected) — they use the plain commands.
+
+### `skill` — manage installed skills
+
+Opens a full-screen manager over your store:
+
+| Key | Action |
+|---|---|
+| `↑` / `↓` | move |
+| `space` | toggle active in the current project |
+| `a` | toggle the default (auto-load) flag |
+| `d` | delete (asks `y/N`) |
+| `enter` | view the `SKILL.md` |
+| `q` / `esc` | quit |
+
+### `skill search` — discover & install
+
+Type a query → browse live results from the [skills registry](https://skills.sh)
+(`npx skills find`) → mark one or more with `space` → `enter` installs all marked
+→ loops back so you can search again. `esc` or an empty query quits. `skill install`
+with no source also opens it.
+
+## Default skills (auto-load)
+
+A "default" is a skill your agent loads automatically on every session start.
+It's a flag **independent** of enable/disable (a skill can be a default without
+being active). Mark one with `skill default <name>` (or `-g` for every project),
+list them with `skill defaults`. The AGENTS.md bootstrap block tells your agent to
+run `skill defaults` then `skill cat <name>` for each.
+
+Defaults live in `skill.config` (`defaults:`) and `config.yaml` (`defaults_global:`).
+
 ## Bootstrap
 
 `skill init -g` injects a short, idempotent block into each detected agent's global
 instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 
+> On session start, run `skill defaults` and load each with `skill cat <name>`.
 > When the user types `/X`, run `skill trigger X`. Single match → apply the output;
 > multiple → show candidates; load each skill only once per session.
 
@@ -167,7 +211,7 @@ git clone https://github.com/victortomaili/skill-cli
 cd skill-cli
 npm install
 npm link            # makes `skill` point at your checkout
-npm test            # 157 tests, network-free (~3s)
+npm test            # 225 tests, network-free (~3s)
 npm run test:e2e    # opt-in: real npx fetch over the network
 ```
 
