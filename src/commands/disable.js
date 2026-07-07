@@ -8,14 +8,20 @@ export function cmdDisable(args) {
 
   if (global) {
     const cfg = readGlobalConfig()
+    const had = (cfg.enabled_global || []).some(a => a.toLowerCase() === name.toLowerCase())
     cfg.enabled_global = (cfg.enabled_global || []).filter(a => a.toLowerCase() !== name.toLowerCase())
     writeGlobalConfig(cfg)
-    console.log(c.green('✓') + ' disabled globally: ' + c.bold(name))
+    console.log(had
+      ? (c.green('✓') + ' disabled globally: ' + c.bold(name))
+      : (c.gray('·') + ' not enabled globally: ' + c.bold(name) + c.gray(' (nothing to do)')))
   } else {
     const cwd = process.cwd()
     const cfg = readProjectConfig(cwd) || { inherit: true, deny: [], allow: [] }
+    const had = (cfg.allow || []).some(a => a.toLowerCase() === name.toLowerCase())
     cfg.allow = (cfg.allow || []).filter(a => a.toLowerCase() !== name.toLowerCase())
     writeProjectConfig(cwd, cfg)
-    console.log(c.green('✓') + ' disabled in project: ' + c.bold(name))
+    console.log(had
+      ? (c.green('✓') + ' disabled in project: ' + c.bold(name))
+      : (c.gray('·') + ' not enabled in project: ' + c.bold(name) + c.gray(' (nothing to do)')))
   }
 }

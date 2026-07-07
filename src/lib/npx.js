@@ -27,12 +27,17 @@ export function fetchSkillsToTemp(source) {
       stdio: ['ignore', 'pipe', 'pipe'],
       encoding: 'utf8',
       shell: false,
+      timeout: 180000, // npx first-run + git clone can be slow; don't hang forever
       env: { ...process.env, CI: '1' },
     })
   } catch (e) {
     fs.rmSync(tmp, { recursive: true, force: true })
-    const tail = ((e.stderr || e.stdout) || '').toString().trim().split('\n').pop()
-    const err = new Error('fetch failed: ' + (tail || e.message))
+    const timedOut = e.signal === 'SIGTERM' || e.code === 'ETIMEDOUT'
+    const tail = timedOut ? '' : ((e.stderr || e.stdout) || '').toString().trim().split('\n').pop()
+    const msg = timedOut
+      ? 'fetch timed out after 3 min (network too slow or source too large?)'
+      : 'fetch failed: ' + (tail || e.message)
+    const err = new Error(msg)
     err.cause = e
     throw err
   }

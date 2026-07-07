@@ -61,8 +61,8 @@ export function cmdInstall(args) {
     }
 
     if (moved.length === 0) {
-      console.error(c.red('No skills moved to store.'))
-      process.exit(1)
+      // throw (not process.exit) so the finally cleans up the temp dir
+      throw new Error('No skills moved to store.')
     }
     console.log(c.green(`✓ Installed ${moved.length} skill(s) to store:`))
     for (const n of moved) {

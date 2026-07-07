@@ -29,14 +29,19 @@ export function listStore() {
   return out.sort((a, b) => a.name.localeCompare(b.name))
 }
 
+// A skill name is a plain identifier (alnum/._-, starting alnum). Rejecting path
+// separators and ".." closes a path-traversal surface: `skill cat ../../x` can't
+// escape STORE_DIR via the dir-name path.
+const SAFE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
+
 export function readSkill(nameOrDir) {
-  // try as dir first, then resolve by SKILL.md name field
-  let md = skillMdPath(nameOrDir)
-  if (!fs.existsSync(md)) {
-    const hit = listStore().find(s => s.name.toLowerCase() === String(nameOrDir).toLowerCase())
+  const n = String(nameOrDir)
+  let md = SAFE_NAME.test(n) && !n.includes('..') && fs.existsSync(skillMdPath(n)) ? skillMdPath(n) : null
+  if (!md) {
+    const hit = listStore().find(s => s.name.toLowerCase() === n.toLowerCase())
     if (!hit) return null
     md = hit.path
   }
   const { data, body } = parseSkillMd(fs.readFileSync(md, 'utf8'))
-  return { name: data.name || nameOrDir, data, body, path: md }
+  return { name: data.name || n, data, body, path: md }
 }

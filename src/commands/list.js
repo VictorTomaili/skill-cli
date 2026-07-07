@@ -3,7 +3,7 @@ import { listStore } from '../lib/store.js'
 import { readGlobalConfig, readProjectConfig, computeEffective } from '../lib/config.js'
 import { trunc } from '../lib/format.js'
 
-export function cmdList() {
+export function cmdList(_args = []) {
   const installed = listStore()
   const globalCfg = readGlobalConfig()
   const projCfg = readProjectConfig()
@@ -36,4 +36,3 @@ function labelScope(name, globalCfg, projCfg) {
   if ((globalCfg.enabled_global || []).some(a => a.toLowerCase() === name.toLowerCase())) return c.blue('global ')
   return c.gray('-      ')
 }
-
