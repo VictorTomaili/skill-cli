@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Manager + `skill list`: clearer activation UI. New **`source`** column shows *why* a skill is/isn't active in the current project — `global` (inherited default), `global·off` (default but denied here), `project` (project allow only), `—` (passive). The label is derived from `active` + `isDefault`, so it can never disagree with the ●/○ marker. The manager now also prints the project path + counts (`installed · active here · global defaults`) and an explicit legend; the `space` (per-project) vs `a` (global default) keys are labelled distinctly.
+
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).

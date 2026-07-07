@@ -6,16 +6,9 @@ import { STORE_DIR } from '../lib/paths.js'
 import { listStore } from '../lib/store.js'
 import { readGlobalConfig, writeGlobalConfig, readProjectConfig, writeProjectConfig, computeEffective, computeDefaults } from '../lib/config.js'
 import { cleanConfig } from './remove.js'
-import { trunc } from '../lib/format.js'
+import { trunc, sourceLabel } from '../lib/format.js'
 
-const KEYS = c.gray('↑↓ move · space toggle · a default · d delete · enter view · q/esc quit')
-
-// where a skill's activation currently comes from (mirrors `skill list`)
-function labelScope(name, g, p) {
-  if (p && (p.allow || []).some(a => a.toLowerCase() === name.toLowerCase())) return c.magenta('project')
-  if ((g.defaults || []).some(a => a.toLowerCase() === name.toLowerCase())) return c.blue('global ')
-  return c.gray('-      ')
-}
+const KEYS = c.gray('↑↓ move · space toggle here · a global default · d delete · enter view · q/esc quit')
 
 // Pure decision: given the current configs, compute the new {allow, deny} arrays
 // that flip `name`'s active state in THIS project. No I/O → unit-testable without
@@ -147,21 +140,28 @@ const managerPrompt = createPrompt((_config, done) => {
   if (mode === 'view' && s) {
     return prefix + ' ' + c.bold(s.name) + c.gray('  (any key to go back)') + '\n' + viewBody(s)
   }
-  const lines = [prefix + ' ' + c.bold('skill manager') + c.gray(' — ' + installed.length + ' installed · ' + eff.length + ' active')]
+  const lines = [
+    prefix + ' ' + c.bold('skill manager') + c.gray(' — project: ') + c.magenta(process.cwd()),
+    c.gray('  ' + installed.length + ' installed · ' + eff.length + ' active here · ' + defs.length + ' global default' + (defs.length === 1 ? '' : 's')),
+    '',
+  ]
   for (let i = 0; i < installed.length; i++) {
     const sk = installed[i]
     const active = eff.includes(sk.name)
+    const isDef = defs.includes(sk.name)
     const arrow = i === cur ? c.cyan('❯') : ' '
     const mark = active ? c.green('●') : c.gray('○')
-    const star = defs.includes(sk.name) ? c.yellow('★') : c.gray('·')
-    const sc = labelScope(sk.name, g, p)
+    const star = isDef ? c.yellow('★') : c.gray('·')
+    const src = sourceLabel(c, active, isDef)
     const trg = sk.triggers.length ? '  ' + c.gray('/' + sk.triggers.join(', /')) : ''
-    const nameStr = sk.name.padEnd(24)
+    const nameStr = sk.name.padEnd(22)
     const nameCol = i === cur ? c.bold(nameStr) : nameStr
-    lines.push(`${arrow} ${mark} ${star} ${nameCol} ${c.gray(String(sk.version || '').padEnd(8))} ${sc}${trg}`)
-    if (i === cur && sk.description) lines.push(c.gray('      ' + trunc(sk.description, 62)))
+    lines.push(`${arrow} ${mark} ${star} ${nameCol} ${c.gray(String(sk.version || '').padEnd(7))} ${src}${trg}`)
+    if (i === cur && sk.description) lines.push(c.gray('      ' + trunc(sk.description, 60)))
   }
-  lines.push(c.gray('  ' + '─'.repeat(58)))
+  lines.push(c.gray('  ' + '─'.repeat(62)))
+  lines.push('  ' + c.green('●') + c.gray(' active here   ') + c.gray('○ passive   ') + c.yellow('★') + c.gray(' global default   ') + c.gray('· not default'))
+  lines.push(c.gray('  source: global = inherited default · project = on here only · global·off = default off here'))
   lines.push('  ' + KEYS)
   if (mode === 'confirm') {
     lines.push('')
