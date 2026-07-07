@@ -7,12 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- `skill remove <name>... [-y]` (aliases `rm`, `uninstall`) — removes skill(s) from the store and cleans up the global enabled list + current project allow-list. Interactive `y/N` confirmation when run on a TTY; non-interactive (no prompt) for agents, CI, and pipes, or when `-y`/`--yes`/`-f`/`--force` is passed. Default answer is **N** (keep).
-
 ### Planned
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
+
+## [0.2.0] - 2026-07-07
+
+### Added
+- `skill remove <name>... [-y]` (aliases `rm`, `uninstall`) — removes skill(s) from the store and cleans up the global enabled list + current project allow-list. Interactive `y/N` confirmation on a TTY (default **N** = keep); non-interactive for agents, CI, and pipes (non-TTY), or when `-y`/`--yes`/`-f`/`--force` is passed. Destination names are canonicalized via the store (case-insensitive; an unknown/`../x` name can't reach the store path). Duplicate and case-variant names are de-duplicated (one removal, accurate count).
 
 ## [0.1.1] - 2026-07-07
 
@@ -51,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Windows `npx` spawn runs with `shell:false` + an args array and rejects sources
   containing shell metacharacters (`& | < > ^`).
 
-[Unreleased]: https://github.com/victortomaili/skill-cli/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/victortomaili/skill-cli/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/victortomaili/skill-cli/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/victortomaili/skill-cli/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/victortomaili/skill-cli/releases/tag/v0.1.0

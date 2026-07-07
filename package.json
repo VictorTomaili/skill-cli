@@ -1,6 +1,6 @@
 {
   "name": "@victortomaili/skill-cli",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Cross-agent skill manager — one global store, clean agent folders, activation via skill.config",
   "license": "MIT",
   "author": "Victor Tomaili <victor@tomaili.com>",
