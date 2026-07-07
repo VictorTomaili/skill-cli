@@ -23,8 +23,9 @@ export function cmdList(_args = []) {
     const active = effective.includes(s.name)
     const mark = active ? c.green('●') : c.gray('○')
     const isDef = defaults.includes(s.name)
+    const isProjAllow = projCfg && (projCfg.allow || []).some(a => a.toLowerCase() === s.name.toLowerCase())
     const star = isDef ? c.yellow('★') : c.gray('·')
-    const sc = sourceLabel(c, active, isDef)
+    const sc = sourceLabel(c, active, isDef, isProjAllow)
     const trg = s.triggers.length ? '  ' + c.gray('/' + s.triggers.join(', /')) : ''
     console.log(`  ${mark} ${star} ${c.bold(s.name.padEnd(22))} ${c.gray(String(s.version).padEnd(8))} ${sc}${trg}`)
     if (s.description) console.log(c.gray('      ' + trunc(s.description, 68)))

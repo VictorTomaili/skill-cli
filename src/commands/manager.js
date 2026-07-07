@@ -149,10 +149,11 @@ const managerPrompt = createPrompt((_config, done) => {
     const sk = installed[i]
     const active = eff.includes(sk.name)
     const isDef = defs.includes(sk.name)
+    const isProjAllow = p && (p.allow || []).some(a => a.toLowerCase() === sk.name.toLowerCase())
     const arrow = i === cur ? c.cyan('❯') : ' '
     const mark = active ? c.green('●') : c.gray('○')
     const star = isDef ? c.yellow('★') : c.gray('·')
-    const src = sourceLabel(c, active, isDef)
+    const src = sourceLabel(c, active, isDef, isProjAllow)
     const trg = sk.triggers.length ? '  ' + c.gray('/' + sk.triggers.join(', /')) : ''
     const nameStr = sk.name.padEnd(22)
     const nameCol = i === cur ? c.bold(nameStr) : nameStr
