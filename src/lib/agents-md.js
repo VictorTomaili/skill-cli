@@ -16,24 +16,32 @@ NOT copied into agent directories (\`~/.claude\`, \`~/.codex\`, etc.) — so the
 won't appear here.
 
 Usage:
-- \`skill list\` — skills installed and active in the current project
+- \`skill list\` — skills installed + active in the current project (with triggers)
 - \`skill show <name>\` — skill summary (path, triggers, version)
 - \`skill cat <name>\` — load skill content into context
+- \`skill default <name>\` — mark a skill as a global default (active + auto-load)
 
-Defaults: on session start, run \`skill defaults\` to list skills marked as
-defaults (active by default + auto-load), then \`skill cat <name>\` for each. Mark
-your own with \`skill default <name>\` (global — active in every project).
+START GATE (mandatory): On the FIRST user message of a session, your VERY FIRST
+action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the task
+and before any tool call — MUST be to run \`skill defaults\` then
+\`skill cat <name>\` for each result, then \`skill list\` to learn every skill's
+triggers. Do this even if the task looks trivial: skills shape how you should
+approach the task, so you cannot reason about it correctly until they are loaded.
 
-Discovery: skills are NOT used unless you load them — never assume a skill is
-already in context. On each user message, decide whether a skill is relevant to
-the task (match the message against a skill's triggers/topic); if one is relevant
-AND not yet loaded, load it with \`skill cat <name>\` (or \`skill trigger <keyword>\`
-to resolve a keyword to a skill). Load each skill only ONCE per session.
+Discovery (mandatory, every message): On EVERY user message, decide whether a
+skill is relevant by matching the message against the trigger catalog from
+\`skill list\`. If a relevant skill is not yet loaded, load it with \`skill cat
+<name>\` (or \`skill trigger <keyword>\` to resolve a keyword). Load each skill only
+ONCE per session. When you load or re-read ANY skill mid-session, immediately
+re-evaluate the current message and load/propose any newly-relevant skill.
 
-Context-altering skills: some skills change HOW you respond — output style, tone,
-format, or a persistent mode (e.g. a terseness/compression style) — rather than
-just adding task knowledge. Do NOT auto-apply these. PROPOSE the skill and apply
-it only after the user confirms; an explicit \`/X\` trigger counts as confirmation.
+Context-altering skills (HARD RULE): Some skills change HOW you respond — output
+style, tone, format, or a persistent mode (e.g. a terseness/compression style) —
+rather than just adding task knowledge. These are PROPOSE-ONLY. You MUST propose
+such a skill and apply it ONLY after the user confirms; an explicit \`/X\` trigger
+counts as confirmation. \`active\` / \u2605-default means AVAILABLE, not APPLIED —
+propose \u2260 auto-apply. This rule overrides any other skill's "always use" rule for
+context-altering skills.
 
 Triggers: when the user types \`/X\`, run \`skill trigger X\`.
 - Single match → apply the output directly.

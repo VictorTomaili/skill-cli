@@ -196,13 +196,13 @@ default; `space` toggles the per-project override.
 `skill init -g` injects a short, idempotent block into each detected agent's global
 instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 
-> On session start, run `skill defaults` and load each with `skill cat <name>`.
-> Skills are NOT in context until you load them — each message, decide whether one
-> is relevant and load it (`skill cat <name>` / `skill trigger <keyword>`); load each
-> only once. A skill that changes HOW you respond (output style/mode) is PROPOSED,
-> not auto-applied — apply only after the user confirms (an explicit `/X` counts).
-> When the user types `/X`, run `skill trigger X` — single match → apply; multiple →
-> show candidates.
+> **START GATE:** on the first user message, your VERY FIRST action — BEFORE
+> ANYTHING ELSE (before thinking, before any tool call) — is `skill defaults` +
+> `skill cat <name>` for each, then `skill list`. Then each
+> message, discover/load relevant skills (`skill cat` / `skill trigger`), once each.
+> A **context-altering** skill (changes HOW you respond — style/mode) is
+> **PROPOSE-ONLY**: propose it, then apply only after the user confirms
+> (`active` ≠ applied; an explicit `/X` counts). `/X` → `skill trigger X`.
 
 It's wrapped in `<!-- BEGIN skill-cli --> … <!-- END skill-cli -->` markers, never
 duplicates, and preserves your existing file content. Re-run `init -g` any time —

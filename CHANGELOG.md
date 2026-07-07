@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.5.1] - 2026-07-07
+
+### Fixed
+- AGENTS.md bootstrap block hardened into hard rules after a live pi-agent test
+  surfaced two gaps. **(a) START GATE:** on the first user message, the agent's
+  VERY FIRST action — BEFORE ANYTHING ELSE (before thinking, before any tool call)
+  — MUST be `skill defaults` + `skill cat <name>` for each, then `skill list`
+  (discovery is mandatory, not optional). **(b) Context-altering = PROPOSE-ONLY:**
+  `active` / ★-default means *available*, not *applied* — propose ≠ auto-apply,
+  and the rule overrides any other skill's "always use" instruction. Also:
+  whenever a skill is loaded mid-session, re-evaluate the message and load/propose
+  any newly-relevant one.
+
 ## [0.5.0] - 2026-07-07
 
 ### Added
