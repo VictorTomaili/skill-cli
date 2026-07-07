@@ -3,7 +3,7 @@
 > One skill store. Clean agent folders. Activate from anywhere.
 
 [![CI](https://github.com/victortomaili/skill-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/victortomaili/skill-cli/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/skill-cli.svg)](https://www.npmjs.com/package/skill-cli)
+[![npm version](https://img.shields.io/npm/v/@victortomaili/skill-cli.svg)](https://www.npmjs.com/package/@victortomaili/skill-cli)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D22-green.svg)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-157%20passing-brightgreen.svg)](#development)
@@ -29,7 +29,7 @@ on GitHub — it helps others discover the project and keeps development going. 
 ## Installation
 
 ```bash
-npm install -g skill-cli
+npm install -g @victortomaili/skill-cli
 ```
 
 Requires Node.js 22+.

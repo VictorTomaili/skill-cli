@@ -1,5 +1,5 @@
 {
-  "name": "skill-cli",
+  "name": "@victortomaili/skill-cli",
   "version": "0.1.0",
   "description": "Cross-agent skill manager — one global store, clean agent folders, activation via skill.config",
   "license": "MIT",
@@ -49,5 +49,9 @@
     "prompt-engineering",
     "developer-tools",
     "workflow"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }
