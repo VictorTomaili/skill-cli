@@ -40,7 +40,8 @@ export function cmdActive() {
     if (s.description) console.log(c.gray('      ' + String(s.description).replace(/[\r\n]+/g, ' ').trim()))
   }
   console.log()
-  console.log(c.yellow('★') + c.gray(' = default. Load a skill: ') + c.cyan('skill cat <name>'))
+  console.log(c.bold(c.yellow('→ For EACH ★ skill above: PROPOSE it now.')) + c.gray(' Task type is irrelevant — \"not needed for this task\" is NOT a reason to skip. The user decides, not you.'))
+  console.log(c.gray('  Load a skill: ') + c.cyan('skill cat <name>'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every

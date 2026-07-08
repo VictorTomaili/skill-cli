@@ -93,6 +93,8 @@ test('AGENTS.md block documents start gate + load/propose rule + discovery', () 
   assert.match(md, /STYLE/)
   assert.match(md, /PRIORITIES/)
   assert.match(md, /CORRECTNESS first/)
+  assert.match(md, /ENFORCEMENT/)
+  assert.match(md, /NEVER silently skipped/)
   assert.match(md, /Discovery/)
 })
 

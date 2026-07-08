@@ -37,7 +37,18 @@ Read it, then for EACH skill decide FROM ITS DESCRIPTION:
   • response STYLE / tone / format / a persistent mode (e.g. a brevity style);
   • CONTEXT-COST / token optimization;
   • an optional ACCELERATOR / shortcut (easier or faster, but not about correctness).
-When unsure → PROPOSE (proposing is the safe default; loading is silent).
+ENFORCEMENT — for EVERY active skill you MUST state a decision OUT LOUD: LOAD it
+or PROPOSE it to the user. Staying silent, or "not needed for this task", is NOT
+a valid decision. In particular:
+- A ★ default is NEVER silently skipped. STYLE / COST / shortcut skills are
+  candidates for EVERY task type — review, debugging, refactor, anything; the task
+  type does NOT disqualify them, and "the user didn't ask" is NOT a reason to stay
+  quiet. If you are not loading a ★ default, you MUST propose it. The ONLY valid
+  reason to stay silent about a ★ is: the user already declined it this session.
+- Do NOT wait for the user to ask — proposing happens HERE, proactively, every turn
+  until the user decides.
+When unsure whether to load or propose → PROPOSE (proposing is the safe default;
+loading is silent).
 PRIORITIES — when trading off how to do the work, rank: CORRECTNESS first, then
 QUALITY, then COST (cheap / token-efficient), then SPEED (fast). Never sacrifice
 correctness or quality for speed or cost.

@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.5] - 2026-07-08
+
+### Changed
+- AGENTS.md START GATE: **ENFORCEMENT** block — for EVERY active skill the agent
+  MUST state a decision out loud (LOAD or PROPOSE); staying silent or "not needed
+  for this task" is not valid. A ★ default is NEVER silently skipped: style/cost/
+  shortcut skills are candidates for every task type, "the user didn't ask" is not a
+  reason to stay quiet, and the only valid silence is the user already declining it
+  this session. Proposing is proactive — don't wait to be asked.
+- `skill active` now prints a bold footer: "For EACH ★ skill above: PROPOSE it now.
+  Task type is irrelevant; 'not needed' is not a skip reason."
+
 ## [0.6.4] - 2026-07-08
 
 ### Added
