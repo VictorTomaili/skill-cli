@@ -42,13 +42,15 @@ export function cmdActive() {
   console.log()
   console.log(c.bold('→ For EACH skill above, decide in your reply:'))
   console.log(c.gray('    LOAD    moves CORRECTNESS/QUALITY → run ') + c.cyan('skill cat <name>') + c.gray(' now.'))
-  console.log(c.gray('    PROPOSE moves COST, STYLE, or SPEED → ASK "enable <name>?" at the TOP of your reply,'))
-  console.log(c.gray('            THEN do the task in the SAME reply. Asking is NON-BLOCKING. A trade-off is the'))
-  console.log(c.gray('            USER') + c.gray("'s decision; it moves an axis on EVERY reply, so NEVER skip and NEVER"))
-  console.log(c.gray('            say "not relevant here". Mentioning / noting / "available" is NOT asking.'))
+  console.log(c.gray('    PROPOSE moves COST, STYLE, or SPEED → ASK "enable <name>?" about ALL of them,'))
+  console.log(c.gray('            then STOP and WAIT for the answer. Do NOT start the task until they answer.'))
+  console.log(c.gray('            The wait is the POINT — a trade-off is the USER') + c.gray("'s decision; it moves an axis") )
+  console.log(c.gray('            on EVERY reply, so NEVER skip and NEVER say "not relevant here".'))
+  console.log(c.gray('            Mentioning / noting / "available" is NOT asking.'))
   console.log(c.gray('    SKIP    moves NONE of the above.'))
-  console.log(c.yellow('  ⚠ Broken-rule excuses: "not relevant here", "would delay the task",'))
-  console.log(c.yellow('    "user has a clear request", "I will just do the task". Each = ask instead.'))
+  console.log(c.yellow('  ⚠ Breaking the gate: starting the task before the user answers,'))
+  console.log(c.yellow('    "would delay it", "user has a clear request", "I will just do the task",'))
+  console.log(c.yellow('    "not relevant here". → ASK first, then wait.'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every

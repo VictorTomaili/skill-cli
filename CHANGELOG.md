@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.7.0] - 2026-07-08
+
+### Changed
+- PROPOSE is now a BLOCKING GATE (per user direction), replacing v0.6.9's
+  non-blocking behavior. The agent must ASK about every cost/style/speed skill in
+  one message, then STOP and WAIT for the answer BEFORE starting the actual task.
+  This kills the recurring "I'll just do the task first" rationalization — there is
+  no "do the task anyway" path. The one-turn wait is the point: the user decides
+  the trade-off before the agent starts. Updated both the AGENTS.md block and the
+  `skill active` footer.
+
 ## [0.6.9] - 2026-07-08
 
 ### Changed
