@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.2] - 2026-07-07
+
+### Changed
+- AGENTS.md START GATE: stricter, broader PROPOSE rule. The agent now auto-loads
+  only skills STRICTLY NECESSARY to attempt the task, and PROPOSES (waits for user
+  confirmation) everything else — explicitly including: response STYLE/format/mode
+  skills, CONTEXT-COST / token optimizers, ACTIVATE-BEFORE-WORK workflows, and any
+  facilitator/accelerator that would make the job EASIER or FASTER. When unsure,
+  propose (propose is the safe default; loading is silent).
+
 ## [0.6.1] - 2026-07-07
 
 ### Changed

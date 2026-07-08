@@ -198,13 +198,14 @@ instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 
 > **START GATE:** on the first user message, your VERY FIRST action — BEFORE
 > ANYTHING ELSE (before thinking, before any tool call) — is `skill active`, the
-> skill **catalog** (every skill's name + full description; never the body). Read
-> it and decide per skill from its description: **functional** for the task → load
-> it (`skill cat <name>`); **context-altering** (changes HOW you respond —
-> style/mode) → **propose**, apply only after the user confirms (`/X` = confirm).
-> **LOADED ≠ LISTED**: a skill is loaded only if you `cat`-ed it this session —
-> listing it (or its ★ / `active` status) is not loading. Any skill can be
-> context-altering; the agent judges from the description (no flag, no fixed list).
+> skill **catalog** (every active skill's name + full description; never the body).
+> Read it and decide per skill from its description: **strictly necessary** to even
+> attempt the task → load it (`skill cat <name>`); **otherwise PROPOSE** — including
+> any skill that changes your response *style/format*, optimizes *context cost*, is
+> meant to be *activated before the work*, or would make the job *easier/faster*
+> (a facilitator). Apply only after the user confirms (`/X` = confirm); when unsure,
+> propose. **LOADED ≠ LISTED**: a skill is loaded only if you `cat`-ed it this
+> session — listing it (or its ★ / `active` status) is not loading.
 > `/X` → `skill trigger X`.
 
 It's wrapped in `<!-- BEGIN skill-cli --> … <!-- END skill-cli -->` markers, never

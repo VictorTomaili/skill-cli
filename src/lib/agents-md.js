@@ -28,10 +28,19 @@ action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the t
 and before any tool call — MUST be to run \`skill active\`. It prints the skill
 CATALOG — every ACTIVE skill's name + FULL description (NOT the skill body).
 Read it, then for EACH skill decide FROM ITS DESCRIPTION:
-- Functional / useful for THIS task → load it: \`skill cat <name>\`.
-- Changes HOW you respond (a style, tone, format, or persistent MODE — e.g. a
-  brevity/compression style) → it is CONTEXT-ALTERING: PROPOSE it to the user and
-  apply ONLY after they confirm (\`/X\` = confirm). Do NOT load/apply it yourself.
+- It is STRICTLY NECESSARY to even attempt the task (you cannot do it without
+  this knowledge) → load it: \`skill cat <name>\`.
+- OTHERWISE PROPOSE it — tell the user it's available and what it does, then apply
+  ONLY after they confirm (\`/X\` = confirm). You MUST propose (never silently apply)
+  any skill that:
+  • changes your communication / response STYLE, tone, format, or a persistent
+    mode (e.g. a brevity / compression style);
+  • optimizes CONTEXT COST / token usage;
+  • is meant to be ACTIVATED BEFORE the work (a workflow / methodology);
+  • would make the job EASIER or FASTER — a facilitator / accelerator / tool —
+    even if optional. Surface it so the user can opt in.
+When unsure whether a skill is necessary or optional → PROPOSE (proposing is the
+  safe default; loading is silent).
 LOADED ≠ LISTED. A skill is loaded ONLY if you have run \`skill cat <name>\` for
 it THIS session. Seeing a skill in \`skill active\` / \`skill list\` does NOT load
 it — you then know only its name + description, nothing more. Never infer a skill

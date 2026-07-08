@@ -88,6 +88,7 @@ test('AGENTS.md block documents start gate + discovery + context-altering rules'
   assert.match(md, /CATALOG/)
   assert.match(md, /LOADED/)
   assert.match(md, /PROPOSE/)
+  assert.match(md, /EASIER or FASTER/)
   assert.match(md, /context-altering/i)
   assert.match(md, /Discovery/)
 })
