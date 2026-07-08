@@ -44,6 +44,12 @@ no discretion and no third option:
   "the user has a clear request", "I'll just do the task first", and "I'll mention it
   and proceed" are FORBIDDEN: each is you deciding for the user. Mentioning / noting /
   "available" is NOT asking — you must ASK a yes/no question and then wait.
+  PARAMETERS (2nd rule): if the skill's description lists activation options to pick
+  from — e.g. a level, a language, a mode, a format, or a strictness — you MUST ask
+  the user to choose them in the SAME proposal (do NOT pick for them), and the gate
+  stays up until they give BOTH the enable decision AND the parameters. Genericize
+  — never assume a particular skill; read its description to see which options (if
+  any) it exposes, and ask for those.
 - moves none of the above → skip.
 When unsure if a skill moves an axis → PROPOSE (ask). LOADED \u2260 LISTED: a skill is
 loaded only if you \`cat\`-ed it this session — listing it, its \u2605, or its \`active\`

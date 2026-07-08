@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.7.1] - 2026-07-08
+
+### Added
+- PARAMETERS (2nd rule, per user direction): when a proposed skill lists activation
+  options in its description (a level, language, mode, format, or strictness), the
+  agent must ask the user to choose them in the SAME proposal and the gate stays up
+  until BOTH the enable decision AND the parameters are given. Don't pick parameters
+  for the user; don't start the task until both are settled. Examples are fully
+  generic (no skill-specific names). Reflected in the AGENTS.md block and the
+  `skill active` footer (new PARAMS row).
+
 ## [0.7.0] - 2026-07-08
 
 ### Changed
