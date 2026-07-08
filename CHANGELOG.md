@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.7.2] - 2026-07-08
+
+### Changed
+- Hardened the PROPOSE gate: the proposal turn must contain ONLY the questions
+  (enable + parameters) and then END the turn — NO exploration, NO tool calls, NO
+  task work. The agent must not start the task until the user answers. Previously
+  the wording said "stop and wait" but allowed the agent to keep exploring; now
+  "END YOUR TURN" is explicit in both the AGENTS.md block and the `skill active`
+  footer. Also added "I'll start exploring while I wait" to the forbidden-excuses
+  list.
+
 ## [0.7.1] - 2026-07-08
 
 ### Added

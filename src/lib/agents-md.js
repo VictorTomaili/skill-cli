@@ -38,12 +38,15 @@ no discretion and no third option:
   is you STEALING the user's decision. Deciding a trade-off is not your role;
   surfacing it is. A line in a table is NOT proposing — you must actually ask.
   PROPOSE IS A GATE: ASK "Enable <name>?" (ask about ALL such skills in ONE message),
-  then STOP and WAIT for the user's answer. Do NOT start the actual task until they
-  answer (yes → apply it, no → proceed without). The one-turn wait is the POINT —
+  then END YOUR TURN and WAIT — do nothing else that turn. The proposal turn contains
+  ONLY the questions (enable + any parameters): NO exploration, NO tool calls, NO
+  reading files, NO starting the task. Do NOT begin the actual task until the user
+  answers (yes → apply it, no → proceed without). The one-turn wait is the POINT —
   the user chooses the trade-off BEFORE you start — so "asking would delay the task",
-  "the user has a clear request", "I'll just do the task first", and "I'll mention it
-  and proceed" are FORBIDDEN: each is you deciding for the user. Mentioning / noting /
-  "available" is NOT asking — you must ASK a yes/no question and then wait.
+  "the user has a clear request", "I'll just do the task first", "I'll mention it and
+  proceed", and "I'll start exploring while I wait" are FORBIDDEN: each is you
+  deciding for the user. Mentioning / noting / "available" is NOT asking — you must
+  ASK a yes/no question and then END your turn.
   PARAMETERS (2nd rule): if the skill's description lists activation options to pick
   from — e.g. a level, a language, a mode, a format, or a strictness — you MUST ask
   the user to choose them in the SAME proposal (do NOT pick for them), and the gate

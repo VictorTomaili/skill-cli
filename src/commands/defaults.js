@@ -43,17 +43,18 @@ export function cmdActive() {
   console.log(c.bold('→ For EACH skill above, decide in your reply:'))
   console.log(c.gray('    LOAD    moves CORRECTNESS/QUALITY → run ') + c.cyan('skill cat <name>') + c.gray(' now.'))
   console.log(c.gray('    PROPOSE moves COST, STYLE, or SPEED → ASK "enable <name>?" about ALL of them,'))
-  console.log(c.gray('            then STOP and WAIT for the answer. Do NOT start the task until they answer.'))
-  console.log(c.gray('            The wait is the POINT — a trade-off is the USER') + c.gray("'s decision; it moves an axis") )
-  console.log(c.gray('            on EVERY reply, so NEVER skip and NEVER say "not relevant here".'))
+  console.log(c.gray('            then END YOUR TURN and WAIT. That turn contains ONLY the questions — NO exploration,'))
+  console.log(c.gray('            NO tool calls, NO task work. Do NOT start the task until they answer. The wait is'))
+  console.log(c.gray('            the POINT — a trade-off is the USER') + c.gray("'s decision; it moves an axis on EVERY") )
+  console.log(c.gray('            reply, so NEVER skip and NEVER say "not relevant here".'))
   console.log(c.gray('            Mentioning / noting / "available" is NOT asking.'))
   console.log(c.gray('    PARAMS  if a proposed skill lists activation options (level / language / mode /'), )
   console.log(c.gray('            format / strictness), ask the user to choose them in the SAME proposal — do not pick'))
   console.log(c.gray('            for them. Gate stays up until enable decision + parameters are both given.'))
   console.log(c.gray('    SKIP    moves NONE of the above.'))
-  console.log(c.yellow('  ⚠ Breaking the gate: starting the task before the user answers,'))
+  console.log(c.yellow('  ⚠ Breaking the gate: starting the task / exploring before the user answers,'))
   console.log(c.yellow('    "would delay it", "user has a clear request", "I will just do the task",'))
-  console.log(c.yellow('    "not relevant here". → ASK first, then wait.'))
+  console.log(c.yellow('    "not relevant here". → ASK first, then END your turn.'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every
