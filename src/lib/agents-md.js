@@ -24,42 +24,26 @@ Usage:
 - \`skill default <name>\` — mark a skill as a global default (active + auto-load)
 
 START GATE (mandatory): On the FIRST user message of a session, your VERY FIRST
-action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the task
-and before any tool call — MUST be to run \`skill active\`. It prints the skill
-CATALOG — every ACTIVE skill's name + FULL description (NOT the skill body).
-Read it, then for EACH skill judge by ONE question — does it affect the work's
-CORRECTNESS, QUALITY, COST (tokens), or SPEED? Decide from the description:
-- Affects CORRECTNESS or QUALITY → AUTO-LOAD it (\`skill cat <name>\`, silently).
-  These are how the job should be done — not optional.
-- Affects COST or SPEED only → PROPOSE it: tell the user what it does and apply
-  ONLY after they confirm (\`/X\` = confirm). These are trade-offs the user opts into.
-- Affects NONE of the four → skip it.
-ENFORCEMENT — state each decision OUT LOUD (load / propose / skip). Task type does
-NOT filter candidates: a COST/STYLE skill (e.g. a compression mode) affects cost on
-EVERY task — review, debugging, refactor, anything — so it is a candidate
-everywhere; "the user didn't ask" is NOT a reason to skip one that applies, and
-"not needed for this technical task" is wrong (style/cost are task-independent).
-Do not wait to be asked — propose proactively. When unsure whether a skill applies
-→ PROPOSE.
-PRIORITIES — when trading off how to do the work, rank: CORRECTNESS first, then
-QUALITY, then COST (cheap / token-efficient), then SPEED (fast). Never sacrifice
-correctness or quality for speed or cost.
-LOADED ≠ LISTED. A skill is loaded ONLY if you have run \`skill cat <name>\` for
-it THIS session. Seeing a skill in \`skill active\` / \`skill list\` does NOT load
-it — you then know only its name + description, nothing more. Never infer a skill
-is in your context from its name, the \u2605 marker, or an \`active\` status: if you
-haven't catted it, treat it as NOT loaded (then decide: cat it, or propose it).
-Do not assume a skill is already applied — \`active\`/\u2605-default = AVAILABLE, not
-APPLIED. ANY skill can be context-altering; judge from the description — there is
-no fixed list and no flag. Do this even if the task looks trivial: skills shape
-how you approach it, so you cannot reason about it correctly until you've reviewed
-them.
-
-Discovery (every message): On EVERY later user message, re-check the catalog
-against the new request; load any newly-relevant functional skill
-(\`skill cat <name>\`), and PROPOSE any newly-relevant context-altering one.
-Load each skill only ONCE per session (\`skill trigger <keyword>\` resolves a
-keyword to a skill).
+action — BEFORE ANYTHING ELSE (before thinking, before any tool call) — MUST be to
+run \`skill active\`. It lists each ACTIVE skill's name + FULL description (never the
+body). Read it, then for EACH skill classify which axis it moves and ACT — there is
+no discretion and no third option:
+- moves CORRECTNESS or QUALITY → load it now: \`skill cat <name>\`.
+- moves COST, SPEED, or response STYLE → PROPOSE it: in THIS reply, ask the user
+  "Enable <name>? It <one-line benefit>." and apply only on yes. These three axes
+  apply to EVERY task by definition (every reply costs tokens and time), so the
+  thoughts "not needed for this task", "the user didn't request it", and "skip
+  unless needed" are FORBIDDEN — they are the exact error. Listing the skill in a
+  table is NOT proposing; you must actually ask.
+- moves none of the above → skip.
+When unsure if a skill moves an axis → PROPOSE (ask). LOADED \u2260 LISTED: a skill is
+loaded only if you \`cat\`-ed it this session — listing it, its \u2605, or its \`active\`
+status is NOT loading; active/\u2605 means AVAILABLE, not APPLIED.
+PRIORITIES: correctness > quality > cost (cheap) > speed — never trade correctness
+or quality for speed or cost.
+Discovery: on EVERY later message, re-run this classification; load newly-relevant
+correctness/quality skills, PROPOSE newly-relevant cost/style/speed ones. Load each
+skill only ONCE per session (\`skill trigger <keyword>\` resolves a keyword).
 
 Triggers: when the user types \`/X\`, run \`skill trigger X\`.
 - Single match → apply the output directly.

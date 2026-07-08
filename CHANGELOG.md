@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.7] - 2026-07-08
+
+### Changed
+- AGENTS.md START GATE: heavily compressed (605 → ~250 words) and made the
+  classification mechanical. cost/style/speed-affecting skills MUST be proposed on
+  EVERY task (those axes apply by definition); the rationalizations "not needed for
+  this task", "the user didn't request it", and "skip unless needed" are now
+  explicitly FORBIDDEN. Also de-hardcoded the caveman example (it overfit the test)
+  — the rule is now fully generic.
+
 ## [0.6.6] - 2026-07-08
 
 ### Changed
