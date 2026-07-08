@@ -16,7 +16,7 @@ export function cmdActive() {
   const eff = computeEffective(installed, globalCfg, projCfg)
   const defs = new Set((globalCfg.defaults || []).map(d => String(d).toLowerCase()))
 
-  console.log(c.bold('skill active') + c.gray(' — active skills (descriptions only). Load only what is STRICTLY necessary; PROPOSE style/cost/workflow/facilitator skills and wait for confirmation.'))
+  console.log(c.bold('skill active') + c.gray(' — active skills (descriptions only). AUTO-LOAD what is necessary or quality-improving; PROPOSE style/cost/shortcut skills and wait for confirmation.'))
   console.log()
 
   if (eff.length === 0) {

@@ -199,13 +199,13 @@ instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 > **START GATE:** on the first user message, your VERY FIRST action — BEFORE
 > ANYTHING ELSE (before thinking, before any tool call) — is `skill active`, the
 > skill **catalog** (every active skill's name + full description; never the body).
-> Read it and decide per skill from its description: **strictly necessary** to even
-> attempt the task → load it (`skill cat <name>`); **otherwise PROPOSE** — including
-> any skill that changes your response *style/format*, optimizes *context cost*, is
-> meant to be *activated before the work*, or would make the job *easier/faster*
-> (a facilitator). Apply only after the user confirms (`/X` = confirm); when unsure,
-> propose. **LOADED ≠ LISTED**: a skill is loaded only if you `cat`-ed it this
-> session — listing it (or its ★ / `active` status) is not loading.
+> Read it and decide per skill from its description: **AUTO-LOAD** (silently) anything
+> needed to do the task at all, or that makes the work **higher-quality / more
+> correct** (domain knowledge, best-practice, standards). **PROPOSE** (apply only
+> after the user confirms; `/X` = confirm) anything that's an optional change to the
+> *experience* — response **style/format/mode**, **context-cost** optimization, or an
+> optional **shortcut** (easier/faster, not about correctness). When unsure, propose.
+> **LOADED ≠ LISTED**: a skill is loaded only if you `cat`-ed it this session.
 > `/X` → `skill trigger X`.
 
 It's wrapped in `<!-- BEGIN skill-cli --> … <!-- END skill-cli -->` markers, never

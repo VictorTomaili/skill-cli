@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.3] - 2026-07-07
+
+### Changed
+- AGENTS.md START GATE: clarified the load-vs-propose line. The agent now AUTO-LOADS
+  (silently) any skill needed to do the task at all, OR that makes the work HIGHER
+  QUALITY / more correct (domain knowledge, best-practice, standards, a quality
+  methodology). It PROPOSES only optional EXPERIENCE changes — response
+  style/format/mode, context-cost/token optimization, and optional shortcuts
+  (easier/faster, not about correctness). When unsure, propose.
+
 ## [0.6.2] - 2026-07-07
 
 ### Changed

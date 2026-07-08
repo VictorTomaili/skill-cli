@@ -78,7 +78,7 @@ test('list shows ★ for a default skill', () => {
   assert.doesNotMatch(betaRow, /★/)
 })
 
-test('AGENTS.md block documents start gate + discovery + context-altering rules', () => {
+test('AGENTS.md block documents start gate + load/propose rule + discovery', () => {
   const h = mkHome(); run(h, ['init', '-g'])
   const md = fs.readFileSync(path.join(h, '.claude', 'CLAUDE.md'), 'utf8')
   assert.match(md, /skill active/)
@@ -88,8 +88,9 @@ test('AGENTS.md block documents start gate + discovery + context-altering rules'
   assert.match(md, /CATALOG/)
   assert.match(md, /LOADED/)
   assert.match(md, /PROPOSE/)
-  assert.match(md, /EASIER or FASTER/)
-  assert.match(md, /context-altering/i)
+  assert.match(md, /easier or faster/)
+  assert.match(md, /HIGHER QUALITY/)
+  assert.match(md, /STYLE/)
   assert.match(md, /Discovery/)
 })
 

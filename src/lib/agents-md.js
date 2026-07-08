@@ -28,19 +28,16 @@ action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the t
 and before any tool call — MUST be to run \`skill active\`. It prints the skill
 CATALOG — every ACTIVE skill's name + FULL description (NOT the skill body).
 Read it, then for EACH skill decide FROM ITS DESCRIPTION:
-- It is STRICTLY NECESSARY to even attempt the task (you cannot do it without
-  this knowledge) → load it: \`skill cat <name>\`.
-- OTHERWISE PROPOSE it — tell the user it's available and what it does, then apply
-  ONLY after they confirm (\`/X\` = confirm). You MUST propose (never silently apply)
-  any skill that:
-  • changes your communication / response STYLE, tone, format, or a persistent
-    mode (e.g. a brevity / compression style);
-  • optimizes CONTEXT COST / token usage;
-  • is meant to be ACTIVATED BEFORE the work (a workflow / methodology);
-  • would make the job EASIER or FASTER — a facilitator / accelerator / tool —
-    even if optional. Surface it so the user can opt in.
-When unsure whether a skill is necessary or optional → PROPOSE (proposing is the
-  safe default; loading is silent).
+- AUTO-LOAD it (\`skill cat <name>\`, silently) when it is needed to do the task AT
+  ALL, OR when it would make the work HIGHER QUALITY / more correct — domain
+  knowledge, best-practice, standards, a quality methodology. These are not
+  optional; they are how the job should be done.
+- PROPOSE it (tell the user what it does; apply ONLY after they confirm; \`/X\` =
+  confirm) when it is an OPTIONAL change to the EXPERIENCE, not to quality:
+  • response STYLE / tone / format / a persistent mode (e.g. a brevity style);
+  • CONTEXT-COST / token optimization;
+  • an optional ACCELERATOR / shortcut (easier or faster, but not about correctness).
+When unsure → PROPOSE (proposing is the safe default; loading is silent).
 LOADED ≠ LISTED. A skill is loaded ONLY if you have run \`skill cat <name>\` for
 it THIS session. Seeing a skill in \`skill active\` / \`skill list\` does NOT load
 it — you then know only its name + description, nothing more. Never infer a skill
