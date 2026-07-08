@@ -27,28 +27,20 @@ START GATE (mandatory): On the FIRST user message of a session, your VERY FIRST
 action — BEFORE ANYTHING ELSE: before you start thinking/reasoning about the task
 and before any tool call — MUST be to run \`skill active\`. It prints the skill
 CATALOG — every ACTIVE skill's name + FULL description (NOT the skill body).
-Read it, then for EACH skill decide FROM ITS DESCRIPTION:
-- AUTO-LOAD it (\`skill cat <name>\`, silently) when it is needed to do the task AT
-  ALL, OR when it would make the work HIGHER QUALITY / more correct — domain
-  knowledge, best-practice, standards, a quality methodology. These are not
-  optional; they are how the job should be done.
-- PROPOSE it (tell the user what it does; apply ONLY after they confirm; \`/X\` =
-  confirm) when it is an OPTIONAL change to the EXPERIENCE, not to quality:
-  • response STYLE / tone / format / a persistent mode (e.g. a brevity style);
-  • CONTEXT-COST / token optimization;
-  • an optional ACCELERATOR / shortcut (easier or faster, but not about correctness).
-ENFORCEMENT — for EVERY active skill you MUST state a decision OUT LOUD: LOAD it
-or PROPOSE it to the user. Staying silent, or "not needed for this task", is NOT
-a valid decision. In particular:
-- A ★ default is NEVER silently skipped. STYLE / COST / shortcut skills are
-  candidates for EVERY task type — review, debugging, refactor, anything; the task
-  type does NOT disqualify them, and "the user didn't ask" is NOT a reason to stay
-  quiet. If you are not loading a ★ default, you MUST propose it. The ONLY valid
-  reason to stay silent about a ★ is: the user already declined it this session.
-- Do NOT wait for the user to ask — proposing happens HERE, proactively, every turn
-  until the user decides.
-When unsure whether to load or propose → PROPOSE (proposing is the safe default;
-loading is silent).
+Read it, then for EACH skill judge by ONE question — does it affect the work's
+CORRECTNESS, QUALITY, COST (tokens), or SPEED? Decide from the description:
+- Affects CORRECTNESS or QUALITY → AUTO-LOAD it (\`skill cat <name>\`, silently).
+  These are how the job should be done — not optional.
+- Affects COST or SPEED only → PROPOSE it: tell the user what it does and apply
+  ONLY after they confirm (\`/X\` = confirm). These are trade-offs the user opts into.
+- Affects NONE of the four → skip it.
+ENFORCEMENT — state each decision OUT LOUD (load / propose / skip). Task type does
+NOT filter candidates: a COST/STYLE skill (e.g. a compression mode) affects cost on
+EVERY task — review, debugging, refactor, anything — so it is a candidate
+everywhere; "the user didn't ask" is NOT a reason to skip one that applies, and
+"not needed for this technical task" is wrong (style/cost are task-independent).
+Do not wait to be asked — propose proactively. When unsure whether a skill applies
+→ PROPOSE.
 PRIORITIES — when trading off how to do the work, rank: CORRECTNESS first, then
 QUALITY, then COST (cheap / token-efficient), then SPEED (fast). Never sacrifice
 correctness or quality for speed or cost.

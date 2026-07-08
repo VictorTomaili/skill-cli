@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.6] - 2026-07-08
+
+### Changed
+- AGENTS.md START GATE: the load/propose/skip decision is now driven by the four
+  criteria (correctness / quality / cost / speed), not "propose every ★". A skill
+  that affects CORRECTNESS or QUALITY → auto-load; affects COST or SPEED only →
+  propose; affects none → skip. Task type still does not filter candidates (a
+  cost/style skill is a candidate on every task), and the agent must state each
+  decision out loud. `skill active` footer rewritten to match.
+
 ## [0.6.5] - 2026-07-08
 
 ### Changed
