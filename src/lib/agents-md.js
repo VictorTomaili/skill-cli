@@ -37,6 +37,11 @@ no discretion and no third option:
   "the user didn't request it", and "skip unless needed" are FORBIDDEN — each one
   is you STEALING the user's decision. Deciding a trade-off is not your role;
   surfacing it is. A line in a table is NOT proposing — you must actually ask.
+  PROPOSE IS NON-BLOCKING: put the question at the TOP of your reply, then DO the
+  task in the SAME reply — asking never delays anything, so "the task is the
+  priority", "the user has a clear request", and "asking would block/delay it" are
+  FORBIDDEN excuses to skip asking. Mentioning / noting / "available" is NOT asking;
+  you must ask a yes/no question (e.g. "Enable <name>?").
 - moves none of the above → skip.
 When unsure if a skill moves an axis → PROPOSE (ask). LOADED \u2260 LISTED: a skill is
 loaded only if you \`cat\`-ed it this session — listing it, its \u2605, or its \`active\`

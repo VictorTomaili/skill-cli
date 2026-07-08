@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.9] - 2026-07-08
+
+### Changed
+- AGENTS.md + `skill active`: PROPOSE is now NON-BLOCKING. The agent finally
+  classified correctly ("caveman is STYLE → I must propose") but then talked itself
+  out of asking via "asking would delay the task" / "user has a clear request" /
+  "I'll just do the task". The new wording makes asking non-blocking (ask at the top,
+  then do the task in the same reply) and explicitly forbids those excuses, plus
+  "mentioning/noting/available is NOT asking".
+
 ## [0.6.8] - 2026-07-08
 
 ### Changed

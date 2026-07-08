@@ -42,11 +42,13 @@ export function cmdActive() {
   console.log()
   console.log(c.bold('→ For EACH skill above, decide in your reply:'))
   console.log(c.gray('    LOAD    moves CORRECTNESS/QUALITY → run ') + c.cyan('skill cat <name>') + c.gray(' now.'))
-  console.log(c.gray('    PROPOSE moves COST, STYLE, or SPEED  → you MUST ASK "enable <name>?". A trade-off is the'))
-  console.log(c.gray('            USER') + c.gray("'s decision — these move an axis on EVERY reply, so NEVER skip one and"))
-  console.log(c.gray('            NEVER say "not relevant to this task" (that = you deciding for the user).'))
+  console.log(c.gray('    PROPOSE moves COST, STYLE, or SPEED → ASK "enable <name>?" at the TOP of your reply,'))
+  console.log(c.gray('            THEN do the task in the SAME reply. Asking is NON-BLOCKING. A trade-off is the'))
+  console.log(c.gray('            USER') + c.gray("'s decision; it moves an axis on EVERY reply, so NEVER skip and NEVER"))
+  console.log(c.gray('            say "not relevant here". Mentioning / noting / "available" is NOT asking.'))
   console.log(c.gray('    SKIP    moves NONE of the above.'))
-  console.log(c.yellow('  ⚠ If you wrote "cost/style but not relevant here" → that is the bug. Ask instead.'))
+  console.log(c.yellow('  ⚠ Broken-rule excuses: "not relevant here", "would delay the task",'))
+  console.log(c.yellow('    "user has a clear request", "I will just do the task". Each = ask instead.'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every
