@@ -16,7 +16,7 @@ export function cmdActive() {
   const eff = computeEffective(installed, globalCfg, projCfg)
   const defs = new Set((globalCfg.defaults || []).map(d => String(d).toLowerCase()))
 
-  console.log(c.bold('skill active') + c.gray(' — active skills (descriptions only). AUTO-LOAD what is necessary or quality-improving; PROPOSE style/cost/shortcut skills and wait for confirmation.'))
+  console.log(c.bold('skill active') + c.gray(' — active skills (descriptions only). LOAD correctness/quality ones; PROPOSE every cost/style/speed one (a trade-off is the USER') + c.gray("'s call — never skip it)."))
   console.log()
 
   if (eff.length === 0) {
@@ -40,7 +40,13 @@ export function cmdActive() {
     if (s.description) console.log(c.gray('      ' + String(s.description).replace(/[\r\n]+/g, ' ').trim()))
   }
   console.log()
-  console.log(c.bold('→ Decide each skill by the criteria:') + c.gray(' affects ') + c.cyan('CORRECTNESS/QUALITY') + c.gray(' → load (') + c.cyan('skill cat <name>') + c.gray('); affects ') + c.cyan('COST/SPEED') + c.gray(' → propose; affects none → skip. Task type is irrelevant; when unsure → propose.'))
+  console.log(c.bold('→ For EACH skill above, decide in your reply:'))
+  console.log(c.gray('    LOAD    moves CORRECTNESS/QUALITY → run ') + c.cyan('skill cat <name>') + c.gray(' now.'))
+  console.log(c.gray('    PROPOSE moves COST, STYLE, or SPEED  → you MUST ASK "enable <name>?". A trade-off is the'))
+  console.log(c.gray('            USER') + c.gray("'s decision — these move an axis on EVERY reply, so NEVER skip one and"))
+  console.log(c.gray('            NEVER say "not relevant to this task" (that = you deciding for the user).'))
+  console.log(c.gray('    SKIP    moves NONE of the above.'))
+  console.log(c.yellow('  ⚠ If you wrote "cost/style but not relevant here" → that is the bug. Ask instead.'))
 }
 
 // `skill default <name>` — mark a skill as a default (active by default in every

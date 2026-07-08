@@ -29,12 +29,14 @@ run \`skill active\`. It lists each ACTIVE skill's name + FULL description (neve
 body). Read it, then for EACH skill classify which axis it moves and ACT — there is
 no discretion and no third option:
 - moves CORRECTNESS or QUALITY → load it now: \`skill cat <name>\`.
-- moves COST, SPEED, or response STYLE → PROPOSE it: in THIS reply, ask the user
-  "Enable <name>? It <one-line benefit>." and apply only on yes. These three axes
-  apply to EVERY task by definition (every reply costs tokens and time), so the
-  thoughts "not needed for this task", "the user didn't request it", and "skip
-  unless needed" are FORBIDDEN — they are the exact error. Listing the skill in a
-  table is NOT proposing; you must actually ask.
+- moves COST, SPEED, or response STYLE → PROPOSE it. These are TRADE-OFFS — the
+  USER decides them, NEVER you. Even if you are SURE one would hurt THIS task, you
+  still ASK: "Enable <name>? It <one-line benefit>." (apply only on yes). They move
+  an axis on EVERY task by definition (every reply has a token cost, a length, a
+  style, a speed), so the thoughts "not relevant to this task", "not needed here",
+  "the user didn't request it", and "skip unless needed" are FORBIDDEN — each one
+  is you STEALING the user's decision. Deciding a trade-off is not your role;
+  surfacing it is. A line in a table is NOT proposing — you must actually ask.
 - moves none of the above → skip.
 When unsure if a skill moves an axis → PROPOSE (ask). LOADED \u2260 LISTED: a skill is
 loaded only if you \`cat\`-ed it this session — listing it, its \u2605, or its \`active\`

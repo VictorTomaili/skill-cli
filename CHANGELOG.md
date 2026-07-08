@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.8] - 2026-07-08
+
+### Changed
+- AGENTS.md + `skill active`: reframed cost/style/speed skills as USER TRADE-OFFS
+  the agent must never pre-judge. The agent kept skipping proposals with "not
+  relevant to this task"; the new wording forbids deciding a trade-off for the
+  user ("not relevant here" = stealing the user's decision). Made the `skill active`
+  footer mechanical (LOAD/PROPOSE/SKIP grid) with an explicit callout: "cost/style
+  but not relevant here → that is the bug. Ask instead."
+
 ## [0.6.7] - 2026-07-08
 
 ### Changed
