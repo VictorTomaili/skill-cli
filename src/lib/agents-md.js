@@ -38,6 +38,9 @@ Read it, then for EACH skill decide FROM ITS DESCRIPTION:
   • CONTEXT-COST / token optimization;
   • an optional ACCELERATOR / shortcut (easier or faster, but not about correctness).
 When unsure → PROPOSE (proposing is the safe default; loading is silent).
+PRIORITIES — when trading off how to do the work, rank: CORRECTNESS first, then
+QUALITY, then COST (cheap / token-efficient), then SPEED (fast). Never sacrifice
+correctness or quality for speed or cost.
 LOADED ≠ LISTED. A skill is loaded ONLY if you have run \`skill cat <name>\` for
 it THIS session. Seeing a skill in \`skill active\` / \`skill list\` does NOT load
 it — you then know only its name + description, nothing more. Never infer a skill

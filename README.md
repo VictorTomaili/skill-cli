@@ -206,6 +206,8 @@ instruction file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`):
 > *experience* — response **style/format/mode**, **context-cost** optimization, or an
 > optional **shortcut** (easier/faster, not about correctness). When unsure, propose.
 > **LOADED ≠ LISTED**: a skill is loaded only if you `cat`-ed it this session.
+> **PRIORITIES**: correctness > quality > cost (cheap) > speed — never sacrifice
+> correctness/quality for speed or cost.
 > `/X` → `skill trigger X`.
 
 It's wrapped in `<!-- BEGIN skill-cli --> … <!-- END skill-cli -->` markers, never

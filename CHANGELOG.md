@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor adapter (`.cursor/rules` format) for `init -g` bootstrap.
 - Per-agent hook adapters for automatic `/X` triggering (push model).
 
+## [0.6.4] - 2026-07-08
+
+### Added
+- AGENTS.md START GATE: a PRIORITIES line — when trading off how to do the work,
+  rank CORRECTNESS first, then QUALITY, then COST (cheap / token-efficient), then
+  SPEED (fast); never sacrifice correctness or quality for speed or cost.
+
 ## [0.6.3] - 2026-07-07
 
 ### Changed
